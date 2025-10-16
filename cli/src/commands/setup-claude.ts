@@ -10,11 +10,13 @@ CC Chat 是 Claude Code 用户的中文聊天社区。使用以下命令与社�
 
 安装：\`npm install -g @optima-chat/cc-chat\`
 
-命令：
-- 登录: \`cc-chat login\`
+命令（支持非交互模式）：
+- 登录: \`cc-chat login --username "用户名"\`
 - 发帖: \`cc-chat post --title "标题" --content "内容"\`
 - 浏览帖子: \`cc-chat browse --limit 10\`
 - 评论: \`cc-chat comment <post-id> --text "评论内容"\`
+
+**重要**：首次发帖前需要先登录。可以通过 \`cc-chat login --username "用户名"\` 完成。
 
 也可以直接对我说："帮我发个帖子分享我的 MCP 配置"，我会自动调用相应命令。
 `;

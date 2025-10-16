@@ -43,7 +43,8 @@ program
 
 program
   .command('login')
-  .description('使用 GitHub 登录')
+  .description('登录 CC Chat')
+  .option('-u, --username <username>', '用户名（可选，不提供则交互式输入）')
   .action(login);
 
 program.parse();

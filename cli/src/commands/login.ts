@@ -3,31 +3,47 @@ import inquirer from 'inquirer';
 import { setToken } from '../config.js';
 import { apiClient } from '../api/client.js';
 
-export async function login() {
+interface LoginOptions {
+  username?: string;
+}
+
+export async function login(options: LoginOptions = {}) {
   try {
     console.log(chalk.cyan('🔐 登录 CC Chat\n'));
 
-    const answers = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'username',
-        message: '请输入你的用户名:',
-        validate: (input) => {
-          if (!input.trim()) {
-            return '用户名不能为空';
-          }
-          if (input.length < 2) {
-            return '用户名至少 2 个字符';
-          }
-          return true;
+    let username = options.username;
+
+    // 如果没有提供用户名参数，使用交互式输入
+    if (!username) {
+      const answers = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'username',
+          message: '请输入你的用户名:',
+          validate: (input) => {
+            if (!input.trim()) {
+              return '用户名不能为空';
+            }
+            if (input.length < 2) {
+              return '用户名至少 2 个字符';
+            }
+            return true;
+          },
         },
-      },
-    ]);
+      ]);
+      username = answers.username;
+    }
+
+    // 验证用户名
+    if (!username || username.length < 2) {
+      console.error(chalk.red('✗ 用户名至少 2 个字符'));
+      process.exit(1);
+    }
 
     console.log(chalk.blue('🔄 正在创建账号...'));
 
     // 调用简化的登录 API
-    const result = await apiClient.login(answers.username);
+    const result = await apiClient.login(username);
 
     // 保存 token
     setToken(result.token);
