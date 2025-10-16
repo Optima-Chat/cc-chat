@@ -51,13 +51,49 @@ npx cc-chat login
 
 ## 技术栈
 
-CLI + Node.js + PostgreSQL + Docker Compose
+- **CLI**: TypeScript + Commander.js + Inquirer
+- **后端**: Fastify + PostgreSQL + Redis
+- **部署**: Railway + Docker Compose
 
 详见 [技术方案](./docs/tech-spec.md)
 
+## 本地开发
+
+```bash
+# 克隆仓库
+git clone https://github.com/Optima-Chat/cc-chat.git
+cd cc-chat
+
+# 启动后端（使用 Docker Compose）
+docker compose up -d
+
+# 开发 CLI
+cd cli
+npm install
+npm run dev -- setup-claude
+```
+
+详见：
+- [API 开发文档](./api/README.md)
+- [CLI 开发文档](./cli/README.md)
+
+## 部署
+
+支持多种部署方式：
+
+- **Railway**（推荐）- 一键部署，$5/月免费额度
+- **Render** - 免费部署
+- **VPS** - 云服务器部署
+
+详见 [部署指南](./docs/deployment.md)
+
 ## 开发状态
 
-🚧 MVP 开发中
+✅ MVP 已完成 - 欢迎试用和反馈！
+
+## 贡献
+
+欢迎提交 Issue 和 Pull Request！
 
 ## License
 
