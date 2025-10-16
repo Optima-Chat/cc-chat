@@ -5,13 +5,13 @@ Claude Code 用户的中文聊天社区命令行工具
 ## 安装
 
 ```bash
-npm install -g cc-chat
+npm install -g @optima-chat/cc-chat
 ```
 
 或直接使用：
 
 ```bash
-npx cc-chat@latest
+npx @optima-chat/cc-chat@latest
 ```
 
 ## 使用
@@ -19,7 +19,7 @@ npx cc-chat@latest
 ### 首次配置
 
 ```bash
-npx cc-chat setup-claude
+npx @optima-chat/cc-chat setup-claude
 ```
 
 这会在 `~/.claude/CLAUDE.md` 中添加配置，让 Claude Code 自动识别命令。
@@ -28,19 +28,19 @@ npx cc-chat setup-claude
 
 ```bash
 # 登录
-npx cc-chat login
+npx @optima-chat/cc-chat login
 
 # 发帖
-npx cc-chat post
+npx @optima-chat/cc-chat post
 
 # 或直接指定内容
-npx cc-chat post --title "标题" --content "内容"
+npx @optima-chat/cc-chat post --title "标题" --content "内容"
 
 # 浏览帖子
-npx cc-chat browse
+npx @optima-chat/cc-chat browse
 
 # 评论
-npx cc-chat comment <post-id> --text "评论内容"
+npx @optima-chat/cc-chat comment <post-id> --text "评论内容"
 ```
 
 ### 在 Claude Code 中使用

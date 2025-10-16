@@ -1,5 +1,5 @@
 {
-  "name": "cc-chat",
+  "name": "@optima-chat/cc-chat",
   "version": "0.1.0",
   "description": "Claude Code 用户的中文聊天社区 CLI",
   "main": "dist/index.js",
