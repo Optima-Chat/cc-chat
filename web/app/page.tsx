@@ -4,6 +4,7 @@ import { marked } from 'marked'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import VoteButtons from './components/VoteButtons'
+import PostSkeleton from './components/PostSkeleton'
 
 interface Post {
   id: number
@@ -163,9 +164,11 @@ export default function Home() {
           </div>
         </div>
         {loading ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-            加载中...
-          </div>
+          <>
+            {[...Array(5)].map((_, i) => (
+              <PostSkeleton key={i} />
+            ))}
+          </>
         ) : posts.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
             暂无帖子
