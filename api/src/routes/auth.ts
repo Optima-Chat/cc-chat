@@ -2,31 +2,96 @@ import { FastifyPluginAsync } from 'fastify';
 import { pool } from '../db.js';
 
 export const authRoutes: FastifyPluginAsync = async (fastify) => {
-  // 简化版登录（MVP 阶段使用用户名，未来实现 GitHub OAuth）
-  fastify.post('/login', async (request, reply) => {
-    const body = request.body as { code?: string; username?: string };
+  // GitHub OAuth 回调处理
+  fastify.post('/github/callback', async (request, reply) => {
+    const { code } = request.body as { code: string };
 
-    // 支持两种方式：旧的 code 方式和新的 username 方式
-    let username: string;
-    let githubId: string;
+    if (!code) {
+      return reply.status(400).send({ message: '缺少授权码' });
+    }
 
-    if (body.username) {
-      // 新方式：使用用户名
-      username = body.username.trim();
+    try {
+      // 使用 code 换取 access_token
+      const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          client_id: process.env.GITHUB_CLIENT_ID,
+          client_secret: process.env.GITHUB_CLIENT_SECRET,
+          code,
+        }),
+      });
 
-      if (!username || username.length < 2) {
-        return reply.status(400).send({ message: '用户名至少 2 个字符' });
+      const tokenData = await tokenResponse.json();
+
+      if (!tokenData.access_token) {
+        return reply.status(400).send({ message: 'GitHub 授权失败' });
       }
 
-      // 使用用户名生成 github_id
-      githubId = `user_${username}_${Date.now()}`;
-    } else if (body.code) {
-      // 旧方式：兼容性
-      githubId = `demo_${Date.now()}`;
-      username = `user_${Date.now()}`;
-    } else {
-      return reply.status(400).send({ message: '缺少用户名或授权码' });
+      // 使用 access_token 获取用户信息
+      const userResponse = await fetch('https://api.github.com/user', {
+        headers: {
+          'Authorization': `Bearer ${tokenData.access_token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      const githubUser = await userResponse.json();
+
+      // 查找或创建用户
+      const existingUser = await pool.query(
+        'SELECT id, github_id, username FROM users WHERE github_id = $1',
+        [String(githubUser.id)]
+      );
+
+      let user;
+
+      if (existingUser.rows.length > 0) {
+        // 用户已存在
+        user = existingUser.rows[0];
+      } else {
+        // 创建新用户
+        const result = await pool.query(
+          `INSERT INTO users (github_id, username, avatar_url)
+           VALUES ($1, $2, $3)
+           RETURNING id, github_id, username`,
+          [String(githubUser.id), githubUser.login, githubUser.avatar_url]
+        );
+        user = result.rows[0];
+      }
+
+      return {
+        token: user.github_id,
+        user: {
+          id: user.id,
+          username: user.username,
+        },
+      };
+    } catch (error) {
+      fastify.log.error(error);
+      return reply.status(500).send({ message: '登录失败' });
     }
+  });
+
+  // 简单用户名登录（兼容旧方式）
+  fastify.post('/login', async (request, reply) => {
+    const body = request.body as { username?: string };
+
+    if (!body.username) {
+      return reply.status(400).send({ message: '缺少用户名' });
+    }
+
+    const username = body.username.trim();
+
+    if (username.length < 2) {
+      return reply.status(400).send({ message: '用户名至少 2 个字符' });
+    }
+
+    // 使用用户名生成 github_id
+    const githubId = `user_${username}_${Date.now()}`;
 
     // 检查用户名是否已存在
     const existingUser = await pool.query(
