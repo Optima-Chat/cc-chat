@@ -9,9 +9,11 @@ export default function LoginButton() {
   const [showMenu, setShowMenu] = useState(false)
   const [inputValue, setInputValue] = useState('')
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    setMounted(true)
     const token = localStorage.getItem('cc_token')
     const user = localStorage.getItem('cc_username')
     if (token && user) {
@@ -81,6 +83,13 @@ export default function LoginButton() {
     setUsername('')
     setShowMenu(false)
     window.location.reload()
+  }
+
+  // 防止初始渲染闪烁
+  if (!mounted) {
+    return (
+      <div className="w-24 h-10 bg-gray-100 rounded-lg animate-pulse" />
+    )
   }
 
   return (
