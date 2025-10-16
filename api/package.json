@@ -1,0 +1,35 @@
+{
+  "name": "cc-chat-api",
+  "version": "0.1.0",
+  "description": "CC Chat 后端 API",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "api",
+    "fastify",
+    "postgresql"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^4.25.2",
+    "@fastify/cors": "^9.0.1",
+    "pg": "^8.11.3",
+    "redis": "^4.6.12",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/pg": "^8.11.0",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

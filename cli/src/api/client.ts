@@ -1,0 +1,60 @@
+import axios, { AxiosInstance } from 'axios';
+import { getApiUrl, getToken } from '../config.js';
+
+class ApiClient {
+  private client: AxiosInstance;
+
+  constructor() {
+    this.client = axios.create({
+      baseURL: getApiUrl(),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // 添加认证拦截器
+    this.client.interceptors.request.use((config) => {
+      const token = getToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+  }
+
+  async createPost(title: string, content: string) {
+    const response = await this.client.post('/api/posts', {
+      title,
+      content,
+    });
+    return response.data;
+  }
+
+  async getPosts(limit: number = 10) {
+    const response = await this.client.get('/api/posts', {
+      params: { limit },
+    });
+    return response.data;
+  }
+
+  async getPost(id: string) {
+    const response = await this.client.get(`/api/posts/${id}`);
+    return response.data;
+  }
+
+  async createComment(postId: string, text: string) {
+    const response = await this.client.post(`/api/posts/${postId}/comments`, {
+      text,
+    });
+    return response.data;
+  }
+
+  async login(code: string) {
+    const response = await this.client.post('/api/auth/login', {
+      code,
+    });
+    return response.data;
+  }
+}
+
+export const apiClient = new ApiClient();

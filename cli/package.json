@@ -1,0 +1,38 @@
+{
+  "name": "cc-chat",
+  "version": "0.1.0",
+  "description": "Claude Code 用户的中文聊天社区 CLI",
+  "main": "dist/index.js",
+  "bin": {
+    "cc-chat": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "keywords": [
+    "claude-code",
+    "cli",
+    "chat",
+    "community"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.0.0",
+    "axios": "^1.6.5",
+    "chalk": "^5.3.0",
+    "inquirer": "^9.2.14",
+    "conf": "^12.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/inquirer": "^9.0.7",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
