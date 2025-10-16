@@ -83,6 +83,31 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       });
     });
 
+    // 获取当前用户的投票状态（如果已登录）
+    let currentUserId: number | null = null;
+    const authHeader = request.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const userResult = await pool.query(
+        'SELECT id FROM users WHERE github_id = $1',
+        [token]
+      );
+      if (userResult.rows.length > 0) {
+        currentUserId = userResult.rows[0].id;
+      }
+    }
+
+    let votesByPost = new Map<number, number>();
+    if (currentUserId && postIds.length > 0) {
+      const votesResult = await pool.query(
+        `SELECT post_id, value FROM votes WHERE user_id = $1 AND post_id = ANY($2)`,
+        [currentUserId, postIds]
+      );
+      votesResult.rows.forEach((row: any) => {
+        votesByPost.set(row.post_id, row.value);
+      });
+    }
+
     const posts = result.rows.map((row) => ({
       id: row.id,
       title: row.title,
@@ -97,6 +122,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
         avatar_url: row.avatar_url,
       },
       tags: tagsByPost.get(row.id) || [],
+      user_vote: votesByPost.get(row.id) || null,
     }));
 
     return posts;
