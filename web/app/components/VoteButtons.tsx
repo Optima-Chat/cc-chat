@@ -17,6 +17,13 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
 
     if (voting) return
 
+    // 检查是否登录
+    const token = localStorage.getItem('cc_token')
+    if (!token) {
+      alert('请先登录再投票')
+      return
+    }
+
     setVoting(true)
 
     // 乐观更新 UI
@@ -27,6 +34,7 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({ value }),
       })
@@ -34,12 +42,18 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
       if (!res.ok) {
         // 如果失败，回滚
         setScore(score)
-        console.error('投票失败')
+        if (res.status === 401) {
+          alert('登录已过期，请重新登录')
+          localStorage.removeItem('cc_token')
+          localStorage.removeItem('cc_username')
+        } else {
+          alert('投票失败')
+        }
       }
     } catch (error) {
       // 如果出错，回滚
       setScore(score)
-      console.error('投票出错:', error)
+      alert('投票出错')
     } finally {
       setVoting(false)
     }
