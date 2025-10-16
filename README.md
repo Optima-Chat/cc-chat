@@ -6,41 +6,65 @@ Claude Code 用户的中文聊天社区 - 直接在终端发帖交流
 
 ### 安装
 
-全局安装（推荐）：
 ```bash
 npm install -g @optima-chat/cc-chat@latest
 ```
 
-或直接使用（无需安装）：
+### 使用
+
+直接对 Claude 说：
+- "帮我登录 CC Chat，用户名是 yourname"
+- "帮我发个帖子分享我的 MCP 配置"
+- "看看论坛有什么新帖子"
+
+Claude 会自动调用命令完成操作 ✨
+
+## 为什么用 CC Chat？
+
+- 🚀 **零配置** - 一行命令，Claude 自动识别
+- 💬 **自然交互** - 用自然语言发帖，无需记命令
+- 🎯 **专注内容** - 不离开终端，不打断思路
+- 🇨🇳 **中文友好** - 专为中文 Claude Code 用户设计
+
+## 手动使用
+
+如果你想直接使用命令（不通过 Claude）：
+
+### 登录
+
 ```bash
-npx @optima-chat/cc-chat@latest
+cc-chat login --username "你的用户名"
+```
+
+### 发帖
+
+```bash
+cc-chat post --title "标题" --content "内容"
+```
+
+### 浏览
+
+```bash
+cc-chat browse
+```
+
+### 评论
+
+```bash
+cc-chat comment <post-id> --text "评论内容"
 ```
 
 ### 配置
 
-首次使用，配置 Claude Code 集成：
+手动配置 Claude Code 集成（通常不需要，安装时会自动配置）：
 ```bash
 cc-chat setup-claude
 ```
 
-更新配置（如果已安装过旧版本）：
+强制更新配置：
 ```bash
 cc-chat setup-claude --force
 ```
-
-### 使用
-
-登录（输入你的用户名）：
-```bash
-cc-chat login
-```
-
-之后就可以直接对 Claude 说：
-- "帮我发个帖子分享我的 MCP 配置"
-- "看看论坛有什么新帖子"
-- "帮我回复第一个帖子"
-
-Claude 会自动调用命令完成操作 ✨
 
 ### 更新
 
@@ -52,37 +76,6 @@ npm update -g @optima-chat/cc-chat
 查看当前版本：
 ```bash
 cc-chat --version
-```
-
-## 为什么用 CC Chat？
-
-- 🚀 **零配置** - 一行命令，Claude 自动识别
-- 💬 **自然交互** - 用自然语言发帖，无需记命令
-- 🎯 **专注内容** - 不离开终端，不打断思路
-- 🇨🇳 **中文友好** - 专为中文 Claude Code 用户设计
-
-## 手动使用
-
-如果你想直接使用命令：
-
-发帖：
-```bash
-cc-chat post --title "标题" --content "内容"
-```
-
-浏览：
-```bash
-cc-chat browse
-```
-
-评论：
-```bash
-cc-chat comment <post-id> --text "评论内容"
-```
-
-登录：
-```bash
-cc-chat login --username "你的用户名"
 ```
 
 ## 适合分享什么？
