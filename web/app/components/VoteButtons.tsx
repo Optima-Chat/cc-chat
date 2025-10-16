@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 interface VoteButtonsProps {
   postId: number
@@ -13,6 +13,7 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
   const [score, setScore] = useState(initialScore)
   const [voting, setVoting] = useState(false)
   const [userVote, setUserVote] = useState<VoteState>(0) // 0=未投, 1=upvote, -1=downvote
+  const userVoteRef = useRef<VoteState>(0) // 使用 ref 追踪最新状态
 
   const handleVote = async (value: 1 | -1, e: React.MouseEvent) => {
     e.preventDefault()
@@ -29,15 +30,18 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
 
     setVoting(true)
 
+    // 使用 ref 读取最新状态，避免异步更新问题
+    const currentVote = userVoteRef.current
+
     // 计算新的分数和投票状态
     let newScore = score
     let newVoteState: VoteState = value
 
-    if (userVote === value) {
+    if (currentVote === value) {
       // 点击已投的票 → 取消投票
       newScore = score - value
       newVoteState = 0
-    } else if (userVote === 0) {
+    } else if (currentVote === 0) {
       // 未投票 → 新投票
       newScore = score + value
       newVoteState = value
@@ -49,9 +53,10 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
 
     // 乐观更新 UI
     const oldScore = score
-    const oldVote = userVote
+    const oldVote = currentVote
     setScore(newScore)
     setUserVote(newVoteState)
+    userVoteRef.current = newVoteState // 立即更新 ref
 
     try {
       const res = await fetch(`https://api.cc-chat.dev/api/posts/${postId}/vote`, {
@@ -67,6 +72,7 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
         // 如果失败，回滚
         setScore(oldScore)
         setUserVote(oldVote)
+        userVoteRef.current = oldVote // 回滚 ref
         if (res.status === 401) {
           alert('登录已过期，请重新登录')
           localStorage.removeItem('cc_token')
@@ -79,6 +85,7 @@ export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) 
       // 如果出错，回滚
       setScore(oldScore)
       setUserVote(oldVote)
+      userVoteRef.current = oldVote // 回滚 ref
       alert('投票出错')
     } finally {
       setVoting(false)
