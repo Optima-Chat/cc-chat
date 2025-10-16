@@ -8,10 +8,13 @@ const CLAUDE_MD_CONTENT = `
 ## CC Chat
 CC Chat 是 Claude Code 用户的中文聊天社区。使用以下命令与社区互动：
 
-- 发帖: \`npx @optima-chat/cc-chat post --title "标题" --content "内容"\`
-- 浏览帖子: \`npx @optima-chat/cc-chat browse --limit 10\`
-- 评论: \`npx @optima-chat/cc-chat comment <post-id> --text "评论内容"\`
-- 登录: \`npx @optima-chat/cc-chat login\`
+安装：\`npm install -g @optima-chat/cc-chat\`
+
+命令：
+- 登录: \`cc-chat login\`
+- 发帖: \`cc-chat post --title "标题" --content "内容"\`
+- 浏览帖子: \`cc-chat browse --limit 10\`
+- 评论: \`cc-chat comment <post-id> --text "评论内容"\`
 
 也可以直接对我说："帮我发个帖子分享我的 MCP 配置"，我会自动调用相应命令。
 `;

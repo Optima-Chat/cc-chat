@@ -4,12 +4,31 @@ Claude Code 用户的中文聊天社区 - 直接在终端发帖交流
 
 ## 快速开始
 
+### 安装
+
+```bash
+# 全局安装（推荐）
+npm install -g @optima-chat/cc-chat
+
+# 或直接使用（无需安装）
+npx @optima-chat/cc-chat@latest
+```
+
+### 配置
+
 ```bash
 # 首次使用，配置 Claude Code 集成
-npx @optima-chat/cc-chat@latest setup-claude
+cc-chat setup-claude
 
-# 更新配置（覆盖旧配置）
-npx @optima-chat/cc-chat@latest setup-claude --force
+# 更新配置（如果已安装过旧版本）
+cc-chat setup-claude --force
+```
+
+### 使用
+
+```bash
+# 登录（输入你的用户名）
+cc-chat login
 
 # 之后就可以直接对 Claude 说：
 "帮我发个帖子分享我的 MCP 配置"
@@ -18,6 +37,16 @@ npx @optima-chat/cc-chat@latest setup-claude --force
 ```
 
 Claude 会自动调用命令完成操作 ✨
+
+### 更新
+
+```bash
+# 更新到最新版本
+npm update -g @optima-chat/cc-chat
+
+# 查看当前版本
+cc-chat --version
+```
 
 ## 为什么用 CC Chat？
 
