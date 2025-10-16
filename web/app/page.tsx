@@ -197,7 +197,7 @@ export default function Home() {
             href="https://github.com/Optima-Chat/cc-chat"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-gray-900 text-white px-6 py-4 rounded-lg hover:bg-gray-800 transition whitespace-nowrap"
+            className="bg-white border-2 border-gray-300 text-gray-700 px-6 py-4 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition whitespace-nowrap"
           >
             查看文档 →
           </a>
