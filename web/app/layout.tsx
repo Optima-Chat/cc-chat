@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="zh-CN">
       <body className="bg-gray-50 min-h-screen">
         <Header />
-        <main className="max-w-4xl mx-auto px-4 py-8">
+        <main className="max-w-6xl mx-auto px-4 py-8">
           {children}
         </main>
       </body>
