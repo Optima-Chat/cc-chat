@@ -297,9 +297,9 @@ export default function Home() {
                     {post.author?.username || '未知用户'} • {formatDate(post.created_at)} • {post.comment_count} 评论
                   </div>
                   <div
-                    className="prose prose-sm max-w-none text-gray-700"
+                    className="prose prose-sm max-w-none text-gray-700 line-clamp-3"
                     dangerouslySetInnerHTML={{
-                      __html: marked(post.content.substring(0, 300) + (post.content.length > 300 ? '...' : ''))
+                      __html: marked(post.content)
                     }}
                   />
                 </div>
