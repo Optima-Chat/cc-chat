@@ -8,9 +8,6 @@ const fastify = Fastify({
   logger: true,
 });
 
-// 初始化数据库
-await initDb();
-
 // CORS
 await fastify.register(cors, {
   origin: true,
@@ -30,6 +27,11 @@ const start = async () => {
     const port = parseInt(process.env.PORT || '3000', 10);
     await fastify.listen({ port, host: '0.0.0.0' });
     console.log(`🚀 服务器运行在 http://localhost:${port}`);
+
+    // 启动后再初始化数据库，避免阻塞健康检查
+    initDb().catch((err) => {
+      fastify.log.error('数据库初始化失败:', err);
+    });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
