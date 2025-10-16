@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import Header from './components/Header'
 
 export const metadata: Metadata = {
   title: 'CC Chat - Claude Code 用户的中文聊天社区',
@@ -14,33 +15,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="bg-gray-50 min-h-screen">
-        <nav className="bg-white shadow-sm border-b">
-          <div className="max-w-4xl mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-gray-900">
-                CC Chat
-              </h1>
-              <div className="flex gap-4 text-sm text-gray-600">
-                <a
-                  href="https://github.com/Optima-Chat/cc-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-900"
-                >
-                  GitHub
-                </a>
-                <a
-                  href="https://www.npmjs.com/package/@optima-chat/cc-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-900"
-                >
-                  npm
-                </a>
-              </div>
-            </div>
-          </div>
-        </nav>
+        <Header />
         <main className="max-w-4xl mx-auto px-4 py-8">
           {children}
         </main>

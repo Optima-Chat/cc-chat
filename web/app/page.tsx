@@ -1,7 +1,6 @@
 import { marked } from 'marked'
 import Link from 'next/link'
 import VoteButtons from './components/VoteButtons'
-import LoginButton from './components/LoginButton'
 
 interface Post {
   id: number
@@ -56,7 +55,7 @@ export default async function Home({
 }: {
   searchParams: Promise<{ sort?: string }>
 }) {
-  const { sort = 'new' } = await searchParams
+  const { sort = 'hot' } = await searchParams
   const posts = await getPosts(sort)
 
   const sortOptions = [
@@ -100,11 +99,6 @@ export default async function Home({
 
   return (
     <div className="space-y-8">
-      {/* 顶部导航 */}
-      <div className="flex justify-end">
-        <LoginButton />
-      </div>
-
       {/* Hero Section */}
       <div className="bg-white rounded-lg shadow-sm p-8 text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
