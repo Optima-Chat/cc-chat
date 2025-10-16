@@ -12,7 +12,7 @@ const program = new Command();
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.4.0');
+  .version('0.4.3');
 
 program
   .command('setup-claude')

@@ -47,10 +47,35 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString('zh-CN')
 }
 
+interface Tag {
+  id: number
+  name: string
+  emoji: string
+  description: string
+}
+
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [tags, setTags] = useState<Tag[]>([])
   const [sort, setSort] = useState<string>('hot')
+  const [selectedTag, setSelectedTag] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const res = await fetch('https://api.cc-chat.dev/api/tags')
+        if (res.ok) {
+          const data = await res.json()
+          setTags(data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch tags:', error)
+      }
+    }
+
+    fetchTags()
+  }, [])
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -61,7 +86,16 @@ export default function Home() {
         headers['Authorization'] = `Bearer ${token}`
       }
 
-      const res = await fetch(`https://api.cc-chat.dev/api/posts?limit=20&sort=${sort}`, {
+      const params = new URLSearchParams({
+        limit: '20',
+        sort,
+      })
+
+      if (selectedTag) {
+        params.append('tag', selectedTag.toString())
+      }
+
+      const res = await fetch(`https://api.cc-chat.dev/api/posts?${params}`, {
         cache: 'no-store',
         headers,
       })
@@ -74,7 +108,7 @@ export default function Home() {
     }
 
     fetchPosts()
-  }, [sort])
+  }, [sort, selectedTag])
 
   const sortOptions = [
     {
@@ -163,6 +197,37 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* 标签筛选 */}
+        {tags.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm p-4">
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedTag(null)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                  selectedTag === null
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                全部
+              </button>
+              {tags.map((tag) => (
+                <button
+                  key={tag.id}
+                  onClick={() => setSelectedTag(tag.id)}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition ${
+                    selectedTag === tag.id
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {tag.emoji} {tag.name}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {loading ? (
           <>
             {[...Array(5)].map((_, i) => (

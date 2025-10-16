@@ -43,10 +43,9 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
     if (tag) {
       query += `
         INNER JOIN post_tags pt ON p.id = pt.post_id
-        INNER JOIN tags t ON pt.tag_id = t.id
-        WHERE t.name = $${paramIndex}
+        WHERE pt.tag_id = $${paramIndex}
       `;
-      params.push(tag);
+      params.push(parseInt(tag, 10));
       paramIndex++;
     }
 

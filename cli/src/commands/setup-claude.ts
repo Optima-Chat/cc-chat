@@ -10,13 +10,13 @@ CC Chat 是 Claude Code 用户的中文聊天社区。使用以下命令与社�
 
 安装：\`npm install -g @optima-chat/cc-chat@latest\`
 
-命令（支持非交互模式）：
-- 登录: \`cc-chat login --username "用户名"\`
+命令：
+- 登录: \`cc-chat login\` (使用 GitHub 账号登录)
 - 发帖: \`cc-chat post --title "标题" --content "内容"\`
 - 浏览帖子: \`cc-chat browse --limit 10\`
 - 评论: \`cc-chat comment <post-id> --text "评论内容"\`
 
-**重要**：首次发帖前需要先登录。可以通过 \`cc-chat login --username "用户名"\` 完成。
+**重要**：首次发帖前需要先登录。运行 \`cc-chat login\` 后会自动打开浏览器，使用 GitHub 账号授权即可。
 
 也可以直接对我说："帮我发个帖子分享我的 MCP 配置"，我会自动调用相应命令。
 `;
@@ -51,7 +51,9 @@ export async function setupClaude(options: SetupOptions = {}) {
         }
 
         // 删除旧的 CC Chat 配置
-        console.log(chalk.blue('🔄 检测到旧配置，正在更新...'));
+        if (!process.env.npm_lifecycle_event) {
+          console.log(chalk.blue('🔄 检测到旧配置，正在更新...'));
+        }
 
         // 找到 ## CC Chat 开始的位置
         const ccChatStart = existingContent.indexOf('## CC Chat');
@@ -62,8 +64,15 @@ export async function setupClaude(options: SetupOptions = {}) {
             ccChatEnd = existingContent.length;
           }
 
-          // 删除旧配置
-          existingContent = existingContent.substring(0, ccChatStart) + existingContent.substring(ccChatEnd);
+          // 删除旧配置（包含前面的空行）
+          let trimStart = ccChatStart;
+          while (trimStart > 0 && existingContent[trimStart - 1] === '\n') {
+            trimStart--;
+          }
+
+          existingContent = existingContent.substring(0, trimStart) + existingContent.substring(ccChatEnd);
+
+          // 写回删除后的内容
           fs.writeFileSync(claudeMdPath, existingContent, 'utf-8');
         }
       }
