@@ -75,16 +75,9 @@ export async function initDb() {
         PRIMARY KEY (post_id, tag_id)
       );
 
-      CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
-      CREATE INDEX IF NOT EXISTS idx_posts_upvotes ON posts(upvotes DESC);
-      CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
-      CREATE INDEX IF NOT EXISTS idx_votes_post ON votes(post_id);
-      CREATE INDEX IF NOT EXISTS idx_votes_user ON votes(user_id);
-      CREATE INDEX IF NOT EXISTS idx_post_tags_post ON post_tags(post_id);
-      CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);
     `);
 
-    // 迁移：为已存在的表添加新字段
+    // 迁移：为已存在的表添加新字段（必须在创建索引之前）
     await client.query(`
       DO $$
       BEGIN
@@ -107,6 +100,17 @@ export async function initDb() {
           ALTER TABLE comments ADD COLUMN upvotes INTEGER DEFAULT 0;
         END IF;
       END $$;
+    `);
+
+    // 创建索引（必须在字段添加之后）
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_posts_created_at ON posts(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_posts_upvotes ON posts(upvotes DESC);
+      CREATE INDEX IF NOT EXISTS idx_comments_post_id ON comments(post_id);
+      CREATE INDEX IF NOT EXISTS idx_votes_post ON votes(post_id);
+      CREATE INDEX IF NOT EXISTS idx_votes_user ON votes(user_id);
+      CREATE INDEX IF NOT EXISTS idx_post_tags_post ON post_tags(post_id);
+      CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);
     `);
 
     // 初始化默认标签
