@@ -14,7 +14,7 @@ export async function post(options: PostOptions) {
     const token = getToken();
     if (!token) {
       console.log(chalk.yellow('⚠ 请先登录'));
-      console.log(chalk.blue('ℹ 运行: npx cc-chat login'));
+      console.log(chalk.blue('ℹ 运行: cc-chat login --username "你的用户名"'));
       process.exit(1);
     }
 

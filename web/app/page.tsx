@@ -1,4 +1,5 @@
 import { marked } from 'marked'
+import Link from 'next/link'
 
 interface Post {
   id: number
@@ -78,20 +79,22 @@ export default async function Home() {
           </div>
         ) : (
           posts.map((post) => (
-            <article key={post.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition">
-              <h4 className="text-xl font-semibold text-gray-900 mb-2">
-                {post.title}
-              </h4>
-              <div className="text-sm text-gray-500 mb-4">
-                {post.author?.username || '未知用户'} • {formatDate(post.created_at)}
-              </div>
-              <div
-                className="prose prose-sm max-w-none text-gray-700"
-                dangerouslySetInnerHTML={{
-                  __html: marked(post.content.substring(0, 300) + (post.content.length > 300 ? '...' : ''))
-                }}
-              />
-            </article>
+            <Link key={post.id} href={`/posts/${post.id}`}>
+              <article className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition cursor-pointer">
+                <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                  {post.title}
+                </h4>
+                <div className="text-sm text-gray-500 mb-4">
+                  {post.author?.username || '未知用户'} • {formatDate(post.created_at)}
+                </div>
+                <div
+                  className="prose prose-sm max-w-none text-gray-700"
+                  dangerouslySetInnerHTML={{
+                    __html: marked(post.content.substring(0, 300) + (post.content.length > 300 ? '...' : ''))
+                  }}
+                />
+              </article>
+            </Link>
           ))
         )}
       </div>

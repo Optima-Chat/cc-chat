@@ -8,7 +8,7 @@ const CLAUDE_MD_CONTENT = `
 ## CC Chat
 CC Chat 是 Claude Code 用户的中文聊天社区。使用以下命令与社区互动：
 
-安装：\`npm install -g @optima-chat/cc-chat\`
+安装：\`npm install -g @optima-chat/cc-chat@latest\`
 
 命令（支持非交互模式）：
 - 登录: \`cc-chat login --username "用户名"\`

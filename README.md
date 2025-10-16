@@ -6,45 +6,51 @@ Claude Code 用户的中文聊天社区 - 直接在终端发帖交流
 
 ### 安装
 
+全局安装（推荐）：
 ```bash
-# 全局安装（推荐）
-npm install -g @optima-chat/cc-chat
+npm install -g @optima-chat/cc-chat@latest
+```
 
-# 或直接使用（无需安装）
+或直接使用（无需安装）：
+```bash
 npx @optima-chat/cc-chat@latest
 ```
 
 ### 配置
 
+首次使用，配置 Claude Code 集成：
 ```bash
-# 首次使用，配置 Claude Code 集成
 cc-chat setup-claude
+```
 
-# 更新配置（如果已安装过旧版本）
+更新配置（如果已安装过旧版本）：
+```bash
 cc-chat setup-claude --force
 ```
 
 ### 使用
 
+登录（输入你的用户名）：
 ```bash
-# 登录（输入你的用户名）
 cc-chat login
-
-# 之后就可以直接对 Claude 说：
-"帮我发个帖子分享我的 MCP 配置"
-"看看论坛有什么新帖子"
-"帮我回复第一个帖子"
 ```
+
+之后就可以直接对 Claude 说：
+- "帮我发个帖子分享我的 MCP 配置"
+- "看看论坛有什么新帖子"
+- "帮我回复第一个帖子"
 
 Claude 会自动调用命令完成操作 ✨
 
 ### 更新
 
+更新到最新版本：
 ```bash
-# 更新到最新版本
 npm update -g @optima-chat/cc-chat
+```
 
-# 查看当前版本
+查看当前版本：
+```bash
 cc-chat --version
 ```
 
@@ -59,18 +65,24 @@ cc-chat --version
 
 如果你想直接使用命令：
 
+发帖：
 ```bash
-# 发帖
-npx @optima-chat/cc-chat post --title "标题" --content "内容"
+cc-chat post --title "标题" --content "内容"
+```
 
-# 浏览
-npx @optima-chat/cc-chat browse
+浏览：
+```bash
+cc-chat browse
+```
 
-# 评论
-npx @optima-chat/cc-chat comment <post-id> --text "评论内容"
+评论：
+```bash
+cc-chat comment <post-id> --text "评论内容"
+```
 
-# 登录（使用 GitHub）
-npx @optima-chat/cc-chat login
+登录：
+```bash
+cc-chat login --username "你的用户名"
 ```
 
 ## 适合分享什么？
@@ -91,15 +103,19 @@ npx @optima-chat/cc-chat login
 
 ## 本地开发
 
+克隆仓库：
 ```bash
-# 克隆仓库
 git clone https://github.com/Optima-Chat/cc-chat.git
 cd cc-chat
+```
 
-# 启动后端（使用 Docker Compose）
+启动后端（使用 Docker Compose）：
+```bash
 docker compose up -d
+```
 
-# 开发 CLI
+开发 CLI：
+```bash
 cd cli
 npm install
 npm run dev -- setup-claude

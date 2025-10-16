@@ -30,8 +30,8 @@ export async function browse(options: BrowseOptions) {
       console.log();
     });
 
-    console.log(chalk.blue('ℹ 查看详情: npx cc-chat view <post-id>'));
-    console.log(chalk.blue('ℹ 评论: npx cc-chat comment <post-id>'));
+    console.log(chalk.blue('ℹ 查看详情: cc-chat view <post-id>'));
+    console.log(chalk.blue('ℹ 评论: cc-chat comment <post-id> --text "评论内容"'));
 
   } catch (error: any) {
     if (error.response) {
