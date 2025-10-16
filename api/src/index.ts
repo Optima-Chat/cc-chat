@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { postsRoutes } from './routes/posts.js';
 import { authRoutes } from './routes/auth.js';
+import { tagsRoutes } from './routes/tags.js';
 import { initDb } from './db.js';
 
 const fastify = Fastify({
@@ -16,6 +17,7 @@ await fastify.register(cors, {
 // 路由
 await fastify.register(postsRoutes, { prefix: '/api/posts' });
 await fastify.register(authRoutes, { prefix: '/api/auth' });
+await fastify.register(tagsRoutes, { prefix: '/api/tags' });
 
 // 健康检查
 fastify.get('/health', async () => {
