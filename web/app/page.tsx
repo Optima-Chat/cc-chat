@@ -60,6 +60,13 @@ export default function Home() {
   const [sort, setSort] = useState<string>('hot')
   const [selectedTag, setSelectedTag] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText('npm install -g @optima-chat/cc-chat@latest')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   useEffect(() => {
     const fetchTags = async () => {
@@ -159,21 +166,42 @@ export default function Home() {
         <p className="text-gray-600 mb-6">
           直接在终端发帖交流 • 零配置 • 自然语言操作
         </p>
-        <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-left text-sm font-mono mb-6">
-          <div className="text-gray-400"># 安装</div>
-          <div className="text-green-400">npm install -g @optima-chat/cc-chat@latest</div>
-          <div className="mt-2 text-gray-400"># 然后对 Claude 说：</div>
-          <div className="text-blue-400">"帮我登录 CC Chat，用户名是 yourname"</div>
-          <div className="text-blue-400">"帮我发个帖子分享我的 MCP 配置"</div>
+        <div className="flex items-center gap-4">
+          <div className="flex-1 bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative">
+            <div className="flex items-center justify-between">
+              <code className="text-green-400">npm install -g @optima-chat/cc-chat@latest</code>
+              <button
+                onClick={handleCopy}
+                className="ml-4 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition flex items-center gap-1"
+              >
+                {copied ? (
+                  <>
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    已复制
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                    </svg>
+                    复制
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+          <a
+            href="https://github.com/Optima-Chat/cc-chat"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition whitespace-nowrap"
+          >
+            查看文档 →
+          </a>
         </div>
-        <a
-          href="https://github.com/Optima-Chat/cc-chat"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition"
-        >
-          查看文档 →
-        </a>
       </div>
 
       {/* Posts List */}
