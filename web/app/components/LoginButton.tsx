@@ -13,6 +13,13 @@ export default function LoginButton() {
     }
     return false
   })
+  const [loadingMessage, setLoadingMessage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search)
+      return urlParams.has('code') ? '正在登录...' : '正在连接 GitHub...'
+    }
+    return '正在连接 GitHub...'
+  })
   const [mounted, setMounted] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -53,7 +60,6 @@ export default function LoginButton() {
 
       setIsLoggedIn(true)
       setUsername(data.user.username)
-      setShowDialog(false)
       setLoading(false)
 
       // 清除 URL 中的 code 参数
@@ -62,7 +68,6 @@ export default function LoginButton() {
     } catch (error) {
       alert('GitHub 登录失败，请重试')
       setLoading(false)
-      setShowDialog(false)
       // 清除 URL 中的 code 参数
       window.history.replaceState({}, '', window.location.pathname)
     }
@@ -85,6 +90,8 @@ export default function LoginButton() {
   }, [showMenu])
 
   const handleGithubLogin = () => {
+    setLoading(true)
+    setLoadingMessage('正在连接 GitHub...')
     const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || 'Iv23listyDH5mTlavL8e'
     const redirectUri = encodeURIComponent(window.location.origin)
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`
@@ -141,12 +148,22 @@ export default function LoginButton() {
       ) : (
         <button
           onClick={handleGithubLogin}
-          className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2"
+          disabled={loading}
+          className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800 transition shadow-sm flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
-          </svg>
-          GitHub 登录
+          {loading ? (
+            <>
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              连接 GitHub...
+            </>
+          ) : (
+            <>
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+              </svg>
+              GitHub 登录
+            </>
+          )}
         </button>
       )}
 
@@ -155,8 +172,8 @@ export default function LoginButton() {
           <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 shadow-2xl">
             <div className="text-center py-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">正在登录</h3>
-              <p className="text-sm text-gray-600">使用 GitHub 账号登录中...</p>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{loadingMessage}</h3>
+              <p className="text-sm text-gray-600">请稍候...</p>
             </div>
           </div>
         </div>

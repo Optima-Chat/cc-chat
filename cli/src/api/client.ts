@@ -55,6 +55,20 @@ class ApiClient {
     });
     return response.data;
   }
+
+  async githubCallback(code: string) {
+    const response = await this.client.post('/api/auth/github/callback', {
+      code,
+    });
+    return response.data;
+  }
+
+  async githubDeviceLogin(accessToken: string) {
+    const response = await this.client.post('/api/auth/github/device', {
+      access_token: accessToken,
+    });
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
