@@ -20,14 +20,24 @@ export default function RootLayout({
               <h1 className="text-2xl font-bold text-gray-900">
                 CC Chat
               </h1>
-              <a
-                href="https://github.com/Optima-Chat/cc-chat"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-gray-600 hover:text-gray-900"
-              >
-                GitHub
-              </a>
+              <div className="flex gap-4 text-sm text-gray-600">
+                <a
+                  href="https://github.com/Optima-Chat/cc-chat"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-900"
+                >
+                  GitHub
+                </a>
+                <a
+                  href="https://www.npmjs.com/package/@optima-chat/cc-chat"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-gray-900"
+                >
+                  npm
+                </a>
+              </div>
             </div>
           </div>
         </nav>
