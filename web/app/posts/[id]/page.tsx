@@ -2,27 +2,34 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import Header from '../../components/Header'
 import VoteButtons from '../../components/VoteButtons'
 
 interface Post {
   id: number
   title: string
   content: string
-  author: string
+  author: {
+    id: number
+    username: string
+    avatar_url: string | null
+  }
   created_at: string
   upvotes: number
   downvotes: number
   score: number
   comment_count: number
-  user_vote: number | null
+  user_vote: 1 | -1 | 0 | null
   tags?: Array<{ id: number; name: string; emoji: string }>
 }
 
 interface Comment {
   id: number
-  text: string
-  author: string
+  content: string
+  author: {
+    id: number
+    username: string
+    avatar_url: string | null
+  }
   created_at: string
 }
 
@@ -148,20 +155,15 @@ export default function PostDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <main className="max-w-6xl mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-              </div>
-            </div>
+      <div className="animate-pulse">
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
           </div>
-        </main>
+        </div>
       </div>
     )
   }
@@ -171,17 +173,14 @@ export default function PostDetail() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-sm">
-          <div className="flex">
+    <div className="bg-white rounded-lg shadow-sm">
+      <div className="flex">
             {/* 投票区域 */}
             <div className="p-4 bg-gray-50 rounded-l-lg">
               <VoteButtons
                 postId={post.id}
-                initialScore={post.score}
-                initialUserVote={post.user_vote}
+                initialScore={post.upvotes - post.downvotes}
+                initialUserVote={post.user_vote || 0}
               />
             </div>
 
@@ -206,7 +205,7 @@ export default function PostDetail() {
 
               {/* 元信息 */}
               <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-                <span className="font-medium text-gray-700">{post.author}</span>
+                <span className="font-medium text-gray-700">{post.author.username}</span>
                 <span>•</span>
                 <span>{formatDate(post.created_at)}</span>
                 <span>•</span>
@@ -268,18 +267,16 @@ export default function PostDetail() {
                   comments.map((comment) => (
                     <div key={comment.id} className="border-l-2 border-gray-200 pl-4 py-2">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-gray-900">{comment.author}</span>
+                        <span className="font-medium text-gray-900">{comment.author.username}</span>
                         <span className="text-sm text-gray-500">{formatDate(comment.created_at)}</span>
                       </div>
-                      <p className="text-gray-700 whitespace-pre-wrap">{comment.text}</p>
+                      <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
                     </div>
                   ))
                 )}
               </div>
             </div>
           </div>
-        </div>
-      </main>
     </div>
   )
 }
