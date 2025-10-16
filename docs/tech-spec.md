@@ -13,7 +13,7 @@
          │ 调用 CLI
          ↓
 ┌──────────────────┐
-│  cc-chat CLI    │
+│  cc-chat CLI     │
 │  (npx)           │
 │                  │
 │  - post          │
@@ -22,13 +22,14 @@
 └────────┬─────────┘
          │ REST API
          ↓
-┌──────────────────┐
-│   后端服务        │
-│                  │
-│  Node.js/FastAPI │
-│  PostgreSQL      │
-│  Redis           │
-└──────────────────┘
+┌──────────────────────────┐
+│   后端服务                │
+│   cc-chat.dev            │
+│                          │
+│  Node.js + Fastify       │
+│  PostgreSQL              │
+│  Redis                   │
+└──────────────────────────┘
 ```
 
 ## 核心流程
@@ -66,6 +67,7 @@ CLI → API → 发布成功
 **部署**
 - Docker Compose
 - Vercel/Railway
+- 域名：cc-chat.dev
 
 ## 核心功能
 
@@ -89,6 +91,8 @@ cc-chat login            # 登录
 
 ### API 端点
 ```
+Base URL: https://api.cc-chat.dev
+
 POST   /api/posts          # 创建帖子
 GET    /api/posts          # 列表
 GET    /api/posts/:id      # 详情
