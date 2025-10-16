@@ -1,5 +1,8 @@
+'use client'
+
 import { marked } from 'marked'
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
 import VoteButtons from './components/VoteButtons'
 
 interface Post {
@@ -18,14 +21,7 @@ interface Post {
     name: string
     emoji: string
   }>
-}
-
-async function getPosts(sort: string = 'new'): Promise<Post[]> {
-  const res = await fetch(`https://api.cc-chat.dev/api/posts?limit=20&sort=${sort}`, {
-    cache: 'no-store',
-  })
-  if (!res.ok) return []
-  return res.json()
+  user_vote: number | null
 }
 
 function formatDate(dateString: string): string {
@@ -50,13 +46,34 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString('zh-CN')
 }
 
-export default async function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ sort?: string }>
-}) {
-  const { sort = 'hot' } = await searchParams
-  const posts = await getPosts(sort)
+export default function Home() {
+  const [posts, setPosts] = useState<Post[]>([])
+  const [sort, setSort] = useState<string>('hot')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true)
+      const headers: Record<string, string> = {}
+      const token = localStorage.getItem('cc_token')
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+      }
+
+      const res = await fetch(`https://api.cc-chat.dev/api/posts?limit=20&sort=${sort}`, {
+        cache: 'no-store',
+        headers,
+      })
+
+      if (res.ok) {
+        const data = await res.json()
+        setPosts(data)
+      }
+      setLoading(false)
+    }
+
+    fetchPosts()
+  }, [sort])
 
   const sortOptions = [
     {
@@ -130,9 +147,9 @@ export default async function Home({
           <h3 className="text-xl font-bold text-gray-900">帖子列表</h3>
           <div className="flex gap-2">
             {sortOptions.map((option) => (
-              <a
+              <button
                 key={option.value}
-                href={`/?sort=${option.value}`}
+                onClick={() => setSort(option.value)}
                 className={`px-3 py-1.5 rounded text-sm flex items-center gap-1.5 ${
                   sort === option.value
                     ? 'bg-gray-900 text-white'
@@ -141,11 +158,15 @@ export default async function Home({
               >
                 {option.icon}
                 {option.label}
-              </a>
+              </button>
             ))}
           </div>
         </div>
-        {posts.length === 0 ? (
+        {loading ? (
+          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+            加载中...
+          </div>
+        ) : posts.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
             暂无帖子
           </div>
@@ -154,7 +175,11 @@ export default async function Home({
             <Link key={post.id} href={`/posts/${post.id}`} className="block">
               <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer flex">
                 {/* 投票区域 */}
-                <VoteButtons postId={post.id} initialScore={post.upvotes - post.downvotes} />
+                <VoteButtons
+                  postId={post.id}
+                  initialScore={post.upvotes - post.downvotes}
+                  initialUserVote={post.user_vote as (1 | -1 | 0) || 0}
+                />
 
                 {/* 内容区域 */}
                 <div className="flex-1 p-6">

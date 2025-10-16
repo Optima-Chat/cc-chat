@@ -5,15 +5,16 @@ import { useState, useRef } from 'react'
 interface VoteButtonsProps {
   postId: number
   initialScore: number
+  initialUserVote?: 1 | -1 | 0
 }
 
 type VoteState = 1 | -1 | 0
 
-export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) {
+export default function VoteButtons({ postId, initialScore, initialUserVote = 0 }: VoteButtonsProps) {
   const [score, setScore] = useState(initialScore)
   const [voting, setVoting] = useState(false)
-  const [userVote, setUserVote] = useState<VoteState>(0) // 0=未投, 1=upvote, -1=downvote
-  const userVoteRef = useRef<VoteState>(0) // 使用 ref 追踪最新状态
+  const [userVote, setUserVote] = useState<VoteState>(initialUserVote) // 从API获取初始投票状态
+  const userVoteRef = useRef<VoteState>(initialUserVote) // 使用 ref 追踪最新状态
 
   const handleVote = async (value: 1 | -1, e: React.MouseEvent) => {
     e.preventDefault()
