@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import { marked } from 'marked'
 import VoteButtons from '../../components/VoteButtons'
 
 interface Post {
@@ -213,9 +214,10 @@ export default function PostDetail() {
               </div>
 
               {/* 内容 */}
-              <div className="prose max-w-none text-gray-700 whitespace-pre-wrap mb-8">
-                {post.content}
-              </div>
+              <div
+                className="prose max-w-none text-gray-700 mb-8"
+                dangerouslySetInnerHTML={{ __html: marked(post.content) }}
+              />
 
               {/* 评论区分隔线 */}
               <div className="border-t border-gray-200 my-6"></div>
