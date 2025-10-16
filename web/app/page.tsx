@@ -166,12 +166,12 @@ export default function Home() {
         <p className="text-gray-600 mb-6">
           直接在终端发帖交流 • 零配置 • 自然语言操作
         </p>
-        <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative">
+        <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative max-w-3xl mx-auto">
           <div className="flex items-center justify-between">
             <code className="text-green-400">npm install -g @optima-chat/cc-chat@latest</code>
             <button
               onClick={handleCopy}
-              className="ml-4 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition flex items-center gap-1"
+              className="ml-4 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition flex items-center gap-1 flex-shrink-0"
             >
               {copied ? (
                 <>
