@@ -16,7 +16,11 @@ CC Chat 是 Claude Code 用户的中文聊天社区。使用以下命令与社�
 也可以直接对我说："帮我发个帖子分享我的 MCP 配置"，我会自动调用相应命令。
 `;
 
-export async function setupClaude() {
+interface SetupOptions {
+  force?: boolean;
+}
+
+export async function setupClaude(options: SetupOptions = {}) {
   try {
     const claudeDir = path.join(homedir(), '.claude');
     const claudeMdPath = path.join(claudeDir, 'CLAUDE.md');
@@ -34,13 +38,33 @@ export async function setupClaude() {
 
       // 检查是否已经配置过
       if (existingContent.includes('## CC Chat')) {
-        console.log(chalk.yellow('⚠ CLAUDE.md 中已存在 CC Chat 配置'));
-        console.log(chalk.blue('ℹ 位置: ' + claudeMdPath));
-        return;
+        if (!options.force) {
+          console.log(chalk.yellow('⚠ CLAUDE.md 中已存在 CC Chat 配置'));
+          console.log(chalk.blue('ℹ 位置: ' + claudeMdPath));
+          console.log(chalk.gray('ℹ 使用 --force 强制更新配置'));
+          return;
+        }
+
+        // 删除旧的 CC Chat 配置
+        console.log(chalk.blue('🔄 检测到旧配置，正在更新...'));
+
+        // 找到 ## CC Chat 开始的位置
+        const ccChatStart = existingContent.indexOf('## CC Chat');
+        if (ccChatStart !== -1) {
+          // 找到下一个 ## 标题或文件结尾
+          let ccChatEnd = existingContent.indexOf('\n## ', ccChatStart + 1);
+          if (ccChatEnd === -1) {
+            ccChatEnd = existingContent.length;
+          }
+
+          // 删除旧配置
+          existingContent = existingContent.substring(0, ccChatStart) + existingContent.substring(ccChatEnd);
+          fs.writeFileSync(claudeMdPath, existingContent, 'utf-8');
+        }
       }
     }
 
-    // 追加内容
+    // 追加新内容
     fs.appendFileSync(claudeMdPath, CLAUDE_MD_CONTENT, 'utf-8');
 
     console.log(chalk.green('✓ 已配置 Claude Code 集成'));

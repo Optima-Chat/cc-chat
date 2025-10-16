@@ -17,6 +17,7 @@ program
 program
   .command('setup-claude')
   .description('配置 Claude Code 集成，写入 ~/.claude/CLAUDE.md')
+  .option('-f, --force', '强制更新配置（覆盖旧配置）')
   .action(setupClaude);
 
 program
