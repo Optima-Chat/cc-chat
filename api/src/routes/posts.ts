@@ -28,7 +28,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
     }
 
     let query = `
-      SELECT DISTINCT
+      SELECT
         p.id, p.title, p.content, p.created_at,
         p.upvotes, p.downvotes, p.comment_count,
         u.id as user_id, u.username, u.avatar_url
