@@ -151,12 +151,13 @@ export default async function Home({
           </div>
         ) : (
           posts.map((post) => (
-            <article key={post.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition flex">
-              {/* 投票区域 */}
-              <VoteButtons postId={post.id} score={post.upvotes - post.downvotes} />
+            <Link key={post.id} href={`/posts/${post.id}`} className="block">
+              <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer flex">
+                {/* 投票区域 */}
+                <VoteButtons postId={post.id} initialScore={post.upvotes - post.downvotes} />
 
-              {/* 内容区域 */}
-              <div className="flex-1 p-6">
+                {/* 内容区域 */}
+                <div className="flex-1 p-6">
                   {/* 标签 */}
                   {post.tags.length > 0 && (
                     <div className="flex gap-2 mb-2">
@@ -168,11 +169,9 @@ export default async function Home({
                     </div>
                   )}
 
-                  <Link href={`/posts/${post.id}`}>
-                    <h4 className="text-xl font-semibold text-gray-900 mb-2 hover:text-blue-600 cursor-pointer">
-                      {post.title}
-                    </h4>
-                  </Link>
+                  <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                    {post.title}
+                  </h4>
                   <div className="text-sm text-gray-500 mb-4">
                     {post.author?.username || '未知用户'} • {formatDate(post.created_at)} • {post.comment_count} 评论
                   </div>
@@ -184,6 +183,7 @@ export default async function Home({
                   />
                 </div>
               </article>
+            </Link>
           ))
         )}
       </div>

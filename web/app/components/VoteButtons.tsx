@@ -1,24 +1,59 @@
 'use client'
 
+import { useState } from 'react'
+
 interface VoteButtonsProps {
   postId: number
-  score: number
+  initialScore: number
 }
 
-export default function VoteButtons({ postId, score }: VoteButtonsProps) {
+export default function VoteButtons({ postId, initialScore }: VoteButtonsProps) {
+  const [score, setScore] = useState(initialScore)
+  const [voting, setVoting] = useState(false)
+
   const handleVote = async (value: number, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
 
-    // TODO: 实现投票 API 调用
-    console.log('Vote:', postId, value)
+    if (voting) return
+
+    setVoting(true)
+
+    // 乐观更新 UI
+    setScore(score + value)
+
+    try {
+      const res = await fetch(`https://api.cc-chat.dev/api/posts/${postId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ value }),
+      })
+
+      if (!res.ok) {
+        // 如果失败，回滚
+        setScore(score)
+        console.error('投票失败')
+      }
+    } catch (error) {
+      // 如果出错，回滚
+      setScore(score)
+      console.error('投票出错:', error)
+    } finally {
+      setVoting(false)
+    }
   }
 
   return (
-    <div className="flex flex-col items-center p-4 bg-gray-50 rounded-l-lg">
+    <div
+      className="flex flex-col items-center p-4 bg-gray-50 rounded-l-lg"
+      onClick={(e) => e.stopPropagation()}
+    >
       <button
         onClick={(e) => handleVote(1, e)}
-        className="text-gray-400 hover:text-orange-500 transition"
+        className="text-gray-400 hover:text-orange-500 transition disabled:opacity-50"
+        disabled={voting}
       >
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 3L15 8H5L10 3Z" />
@@ -29,7 +64,8 @@ export default function VoteButtons({ postId, score }: VoteButtonsProps) {
       </span>
       <button
         onClick={(e) => handleVote(-1, e)}
-        className="text-gray-400 hover:text-blue-500 transition"
+        className="text-gray-400 hover:text-blue-500 transition disabled:opacity-50"
+        disabled={voting}
       >
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
           <path d="M10 17L5 12H15L10 17Z" />
