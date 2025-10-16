@@ -166,41 +166,31 @@ export default function Home() {
         <p className="text-gray-600 mb-6">
           直接在终端发帖交流 • 零配置 • 自然语言操作
         </p>
-        <div className="flex items-center gap-4">
-          <div className="flex-1 bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative">
-            <div className="flex items-center justify-between">
-              <code className="text-green-400">npm install -g @optima-chat/cc-chat@latest</code>
-              <button
-                onClick={handleCopy}
-                className="ml-4 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition flex items-center gap-1"
-              >
-                {copied ? (
-                  <>
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    已复制
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                    </svg>
-                    复制
-                  </>
-                )}
-              </button>
-            </div>
+        <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative">
+          <div className="flex items-center justify-between">
+            <code className="text-green-400">npm install -g @optima-chat/cc-chat@latest</code>
+            <button
+              onClick={handleCopy}
+              className="ml-4 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition flex items-center gap-1"
+            >
+              {copied ? (
+                <>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                  已复制
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                  </svg>
+                  复制
+                </>
+              )}
+            </button>
           </div>
-          <a
-            href="https://github.com/Optima-Chat/cc-chat"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white border-2 border-gray-300 text-gray-700 px-6 py-4 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition whitespace-nowrap"
-          >
-            查看文档 →
-          </a>
         </div>
       </div>
 
