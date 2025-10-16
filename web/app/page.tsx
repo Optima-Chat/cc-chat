@@ -1,5 +1,6 @@
 import { marked } from 'marked'
 import Link from 'next/link'
+import VoteButtons from './components/VoteButtons'
 
 interface Post {
   id: number
@@ -150,27 +151,12 @@ export default async function Home({
           </div>
         ) : (
           posts.map((post) => (
-            <Link key={post.id} href={`/posts/${post.id}`} className="block">
-              <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer flex">
-                {/* 投票区域 */}
-                <div className="flex flex-col items-center p-4 bg-gray-50 rounded-l-lg">
-                  <button className="text-gray-400 hover:text-orange-500">
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 3L15 8H5L10 3Z" />
-                    </svg>
-                  </button>
-                  <span className="text-lg font-semibold my-1">
-                    {post.upvotes - post.downvotes}
-                  </span>
-                  <button className="text-gray-400 hover:text-blue-500">
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M10 17L5 12H15L10 17Z" />
-                    </svg>
-                  </button>
-                </div>
+            <article key={post.id} className="bg-white rounded-lg shadow-sm hover:shadow-md transition flex">
+              {/* 投票区域 */}
+              <VoteButtons postId={post.id} score={post.upvotes - post.downvotes} />
 
-                {/* 内容区域 */}
-                <div className="flex-1 p-6">
+              {/* 内容区域 */}
+              <div className="flex-1 p-6">
                   {/* 标签 */}
                   {post.tags.length > 0 && (
                     <div className="flex gap-2 mb-2">
@@ -182,9 +168,11 @@ export default async function Home({
                     </div>
                   )}
 
-                  <h4 className="text-xl font-semibold text-gray-900 mb-2">
-                    {post.title}
-                  </h4>
+                  <Link href={`/posts/${post.id}`}>
+                    <h4 className="text-xl font-semibold text-gray-900 mb-2 hover:text-blue-600 cursor-pointer">
+                      {post.title}
+                    </h4>
+                  </Link>
                   <div className="text-sm text-gray-500 mb-4">
                     {post.author?.username || '未知用户'} • {formatDate(post.created_at)} • {post.comment_count} 评论
                   </div>
@@ -196,7 +184,6 @@ export default async function Home({
                   />
                 </div>
               </article>
-            </Link>
           ))
         )}
       </div>
