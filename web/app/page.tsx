@@ -117,7 +117,7 @@ export default async function Home({
           </div>
         ) : (
           posts.map((post) => (
-            <Link key={post.id} href={`/posts/${post.id}`}>
+            <Link key={post.id} href={`/posts/${post.id}`} className="block">
               <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition cursor-pointer flex">
                 {/* 投票区域 */}
                 <div className="flex flex-col items-center p-4 bg-gray-50 rounded-l-lg">
