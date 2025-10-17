@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import VoteButtons from '../../components/VoteButtons'
 import GithubLoginButton from '../../components/GithubLoginButton'
 import MarkdownContent from '../../components/MarkdownContent'
@@ -244,7 +245,12 @@ export default function PostDetail() {
 
               {/* 元信息 */}
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
-                <span className="font-medium text-gray-700">{post.author.username}</span>
+                <Link
+                  href={`/users/${post.author.username}`}
+                  className="font-medium text-gray-700 hover:text-blue-600 transition"
+                >
+                  {post.author.username}
+                </Link>
                 <span>•</span>
                 <span>{formatDate(post.created_at)}</span>
                 <span>•</span>
@@ -299,7 +305,12 @@ export default function PostDetail() {
                   comments.map((comment) => (
                     <div key={comment.id} className="border-l-2 border-gray-200 pl-3 sm:pl-4 py-2">
                       <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
-                        <span className="text-sm sm:text-base font-medium text-gray-900">{comment.author.username}</span>
+                        <Link
+                          href={`/users/${comment.author.username}`}
+                          className="text-sm sm:text-base font-medium text-gray-900 hover:text-blue-600 transition"
+                        >
+                          {comment.author.username}
+                        </Link>
                         <span className="text-xs sm:text-sm text-gray-500">{formatDate(comment.created_at)}</span>
                       </div>
                       <p className="text-sm sm:text-base text-gray-700 whitespace-pre-wrap mb-2">{comment.content}</p>

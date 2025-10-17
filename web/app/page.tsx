@@ -315,7 +315,15 @@ export default function Home() {
                     {post.title}
                   </h4>
                   <div className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
-                    {post.author?.username || '未知用户'} • {formatDate(post.created_at)} • {post.comment_count} 评论
+                    <Link
+                      href={`/users/${post.author?.username}`}
+                      className="hover:text-blue-600 transition"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {post.author?.username || '未知用户'}
+                    </Link>
+                    {' • '}
+                    {formatDate(post.created_at)} • {post.comment_count} 评论
                   </div>
                   <div className="line-clamp-3 text-gray-700">
                     <MarkdownContent content={post.content} className="prose-sm" />
