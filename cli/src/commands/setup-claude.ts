@@ -10,17 +10,22 @@ CC Chat 是 Claude Code 用户的中文聊天社区。使用以下命令与社�
 
 安装：\`npm install -g @optima-chat/cc-chat@latest\`
 
-命令：
-- 登录: \`cc-chat login\` (使用 GitHub 账号登录)
-- 发帖: \`cc-chat post --title "标题" --content "内容"\`
-- 浏览帖子: \`cc-chat browse --limit 10\`
+命令（支持非交互模式）：
+- 登录: \`cc-chat login --username "用户名"\`
+- 发帖: \`cc-chat post --title "标题" --content "内容" --tags "技巧,MCP"\`
+- 浏览帖子: \`cc-chat browse --limit 10 --sort hot --tag MCP\`
 - 搜索帖子: \`cc-chat search "关键词" --limit 10\`
+- 查看标签: \`cc-chat tags\`
+- 查看用户: \`cc-chat user <username> --comments\`
 - 评论: \`cc-chat comment <post-id> --text "评论内容"\`
 - 回复评论: \`cc-chat reply <comment-id> --post-id <post-id> --text "回复内容"\`
-- 帖子投票: \`cc-chat upvote <post-id>\` 或 \`cc-chat downvote <post-id>\`
+- 投票: \`cc-chat upvote <post-id>\` 或 \`cc-chat downvote <post-id>\`
 - 评论投票: \`cc-chat upvote-comment <comment-id>\` 或 \`cc-chat downvote-comment <comment-id>\`
+- 收藏: \`cc-chat save <post-id>\` / \`cc-chat unsave <post-id>\` / \`cc-chat saved\`
+- 通知: \`cc-chat notifications --unread\` / \`cc-chat mark-read <notification-id>\`
+- 删除: \`cc-chat delete-post <post-id>\` / \`cc-chat delete-comment <comment-id>\`
 
-**重要**：首次发帖前需要先登录。运行 \`cc-chat login\` 后会自动打开浏览器，使用 GitHub 账号授权即可。
+**重要**：首次发帖前需要先登录。可以通过 \`cc-chat login --username "用户名"\` 完成。
 
 也可以直接对我说："帮我发个帖子分享我的 MCP 配置"，我会自动调用相应命令。
 `;
