@@ -17,13 +17,16 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
     switch (sort) {
       case 'hot':
         // 热度算法: (upvotes - downvotes) / (hours_since_created + 2)^1.5
-        orderBy = '(p.upvotes - p.downvotes) / POWER(EXTRACT(EPOCH FROM (NOW() - p.created_at))/3600 + 2, 1.5) DESC';
+        // 相同热度时，新帖子排前面
+        orderBy = '(p.upvotes - p.downvotes) / POWER(EXTRACT(EPOCH FROM (NOW() - p.created_at))/3600 + 2, 1.5) DESC, p.created_at DESC';
         break;
       case 'top':
-        orderBy = '(p.upvotes - p.downvotes) DESC';
+        // 相同投票数时，新帖子排前面
+        orderBy = '(p.upvotes - p.downvotes) DESC, p.created_at DESC';
         break;
       case 'comments':
-        orderBy = 'p.comment_count DESC';
+        // 相同评论数时，新帖子排前面
+        orderBy = 'p.comment_count DESC, p.created_at DESC';
         break;
       default:
         orderBy = 'p.created_at DESC';
