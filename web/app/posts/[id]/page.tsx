@@ -27,6 +27,7 @@ interface Post {
 interface Comment {
   id: number
   content: string
+  upvotes: number
   author: {
     id: number
     username: string
@@ -139,6 +140,42 @@ export default function PostDetail() {
       alert('评论失败，请重试')
     } finally {
       setSubmitting(false)
+    }
+  }
+
+  const handleCommentVote = async (commentId: number) => {
+    if (!isLoggedIn) {
+      alert('请先登录')
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('cc_token')
+      const res = await fetch(`https://api.cc-chat.dev/api/posts/comments/${commentId}/vote`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ value: 1 }),
+      })
+
+      if (res.ok) {
+        const result = await res.json()
+        const isCancel = result.message.includes('取消')
+
+        // 更新评论点赞数
+        setComments(comments.map(comment =>
+          comment.id === commentId
+            ? { ...comment, upvotes: comment.upvotes + (isCancel ? -1 : 1) }
+            : comment
+        ))
+      } else {
+        alert('投票失败，请重试')
+      }
+    } catch (error) {
+      console.error('Failed to vote comment:', error)
+      alert('投票失败，请重试')
     }
   }
 
@@ -265,7 +302,16 @@ export default function PostDetail() {
                         <span className="text-sm sm:text-base font-medium text-gray-900">{comment.author.username}</span>
                         <span className="text-xs sm:text-sm text-gray-500">{formatDate(comment.created_at)}</span>
                       </div>
-                      <p className="text-sm sm:text-base text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                      <p className="text-sm sm:text-base text-gray-700 whitespace-pre-wrap mb-2">{comment.content}</p>
+                      <button
+                        onClick={() => handleCommentVote(comment.id)}
+                        className="flex items-center gap-1 text-xs sm:text-sm text-gray-500 hover:text-orange-500 transition"
+                      >
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+                        </svg>
+                        <span>{comment.upvotes || 0}</span>
+                      </button>
                     </div>
                   ))
                 )}
