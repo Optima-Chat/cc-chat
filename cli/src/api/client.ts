@@ -132,7 +132,7 @@ class ApiClient {
   }
 
   async bookmarkPost(postId: string) {
-    const response = await this.client.post(`/api/bookmarks/${postId}`);
+    const response = await this.client.post(`/api/bookmarks/${postId}`, {});
     return response.data;
   }
 
