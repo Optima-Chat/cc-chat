@@ -37,6 +37,13 @@ class ApiClient {
     return response.data;
   }
 
+  async searchPosts(query: string, limit: number = 10) {
+    const response = await this.client.get('/api/posts', {
+      params: { search: query, limit },
+    });
+    return response.data;
+  }
+
   async getPost(id: string) {
     const response = await this.client.get(`/api/posts/${id}`);
     return response.data;

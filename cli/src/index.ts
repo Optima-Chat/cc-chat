@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import { setupClaude } from './commands/setup-claude.js';
 import { post } from './commands/post.js';
 import { browse } from './commands/browse.js';
+import { search } from './commands/search.js';
 import { login } from './commands/login.js';
 import { comment } from './commands/comment.js';
 
@@ -33,6 +34,12 @@ program
   .description('浏览帖子列表')
   .option('-l, --limit <number>', '显示数量', '10')
   .action(browse);
+
+program
+  .command('search [query]')
+  .description('搜索帖子')
+  .option('-l, --limit <number>', '显示数量', '10')
+  .action((query, options) => search({ query, ...options }));
 
 program
   .command('comment <post-id>')
