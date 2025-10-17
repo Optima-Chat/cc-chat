@@ -4,6 +4,7 @@ import { postsRoutes } from './routes/posts.js';
 import { authRoutes } from './routes/auth.js';
 import { tagsRoutes } from './routes/tags.js';
 import { usersRoutes } from './routes/users.js';
+import { notificationsRoutes } from './routes/notifications.js';
 import { initDb } from './db.js';
 
 const fastify = Fastify({
@@ -20,6 +21,7 @@ await fastify.register(postsRoutes, { prefix: '/api/posts' });
 await fastify.register(authRoutes, { prefix: '/api/auth' });
 await fastify.register(tagsRoutes, { prefix: '/api/tags' });
 await fastify.register(usersRoutes, { prefix: '/api/users' });
+await fastify.register(notificationsRoutes, { prefix: '/api/notifications' });
 
 // 健康检查
 fastify.get('/health', async () => {

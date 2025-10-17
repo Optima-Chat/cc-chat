@@ -77,6 +77,17 @@ export async function initDb() {
         PRIMARY KEY (post_id, tag_id)
       );
 
+      CREATE TABLE IF NOT EXISTS notifications (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        actor_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        type VARCHAR(50) NOT NULL CHECK (type IN ('POST_REPLY', 'COMMENT_REPLY', 'MENTION')),
+        post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+        comment_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
+        is_read BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
+
     `);
 
     // 迁移：为已存在的表添加新字段（必须在创建索引之前）
@@ -121,6 +132,8 @@ export async function initDb() {
       CREATE INDEX IF NOT EXISTS idx_votes_user ON votes(user_id);
       CREATE INDEX IF NOT EXISTS idx_post_tags_post ON post_tags(post_id);
       CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);
+      CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
     `);
 
     // 初始化默认标签

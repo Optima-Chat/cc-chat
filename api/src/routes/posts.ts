@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { pool } from '../db.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { createNotification, createMentionNotifications } from '../services/notifications.js';
 
 export const postsRoutes: FastifyPluginAsync = async (fastify) => {
   // 获取帖子列表
@@ -379,11 +380,49 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       [id, request.user!.id, text, parent_id || null]
     );
 
+    const commentId = result.rows[0].id;
+
     // 更新帖子评论数
     await pool.query(
       'UPDATE posts SET comment_count = comment_count + 1 WHERE id = $1',
       [id]
     );
+
+    // 创建通知
+    if (parent_id) {
+      // 回复评论：通知被回复的评论作者
+      const parentComment = await pool.query(
+        'SELECT user_id FROM comments WHERE id = $1',
+        [parent_id]
+      );
+      if (parentComment.rows.length > 0) {
+        await createNotification({
+          userId: parentComment.rows[0].user_id,
+          actorId: request.user!.id,
+          type: 'COMMENT_REPLY',
+          postId: parseInt(id, 10),
+          commentId,
+        });
+      }
+    } else {
+      // 评论帖子：通知帖子作者
+      const post = await pool.query(
+        'SELECT user_id FROM posts WHERE id = $1',
+        [id]
+      );
+      if (post.rows.length > 0) {
+        await createNotification({
+          userId: post.rows[0].user_id,
+          actorId: request.user!.id,
+          type: 'POST_REPLY',
+          postId: parseInt(id, 10),
+          commentId,
+        });
+      }
+    }
+
+    // 检测 @mentions 并创建通知
+    await createMentionNotifications(text, request.user!.id, parseInt(id, 10), commentId);
 
     // 获取用户信息
     const userResult = await pool.query(
@@ -392,7 +431,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
     );
 
     return {
-      id: result.rows[0].id,
+      id: commentId,
       post_id: parseInt(id, 10),
       content: text,
       upvotes: 0,

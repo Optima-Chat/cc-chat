@@ -11,13 +11,14 @@ import { comment } from './commands/comment.js';
 import { reply } from './commands/reply.js';
 import { vote, voteComment } from './commands/vote.js';
 import { deletePost, deleteComment } from './commands/delete.js';
+import { notifications, getUnreadCount, markNotificationRead, markAllNotificationsRead } from './commands/notifications.js';
 
 const program = new Command();
 
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.10.0');
+  .version('0.11.0');
 
 program
   .command('setup-claude')
@@ -88,6 +89,28 @@ program
   .description('删除评论')
   .option('-y, --yes', '跳过确认提示')
   .action(deleteComment);
+
+program
+  .command('notifications')
+  .description('查看通知')
+  .option('--unread', '仅显示未读通知')
+  .option('-l, --limit <number>', '显示数量', '20')
+  .action(notifications);
+
+program
+  .command('unread-count')
+  .description('查看未读通知数量')
+  .action(getUnreadCount);
+
+program
+  .command('mark-read <notification-id>')
+  .description('标记通知为已读')
+  .action(markNotificationRead);
+
+program
+  .command('mark-read-all')
+  .description('标记所有通知为已读')
+  .action(markAllNotificationsRead);
 
 program
   .command('login')

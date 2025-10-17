@@ -108,6 +108,28 @@ class ApiClient {
     const response = await this.client.delete(`/api/posts/comments/${commentId}`);
     return response.data;
   }
+
+  async getNotifications(limit: number = 20) {
+    const response = await this.client.get('/api/notifications', {
+      params: { limit },
+    });
+    return response.data;
+  }
+
+  async getUnreadNotificationsCount() {
+    const response = await this.client.get('/api/notifications/unread-count');
+    return response.data;
+  }
+
+  async markNotificationRead(notificationId: string) {
+    const response = await this.client.put(`/api/notifications/${notificationId}/read`);
+    return response.data;
+  }
+
+  async markAllNotificationsRead() {
+    const response = await this.client.put('/api/notifications/read-all');
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
