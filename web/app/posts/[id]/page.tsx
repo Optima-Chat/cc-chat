@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { marked } from 'marked'
 import VoteButtons from '../../components/VoteButtons'
 import GithubLoginButton from '../../components/GithubLoginButton'
+import MarkdownContent from '../../components/MarkdownContent'
 
 interface Post {
   id: number
@@ -215,10 +215,9 @@ export default function PostDetail() {
               </div>
 
               {/* 内容 */}
-              <div
-                className="prose prose-sm sm:prose max-w-none text-gray-700 mb-6 sm:mb-8"
-                dangerouslySetInnerHTML={{ __html: marked(post.content) }}
-              />
+              <div className="text-gray-700 mb-6 sm:mb-8">
+                <MarkdownContent content={post.content} />
+              </div>
 
               {/* 评论区分隔线 */}
               <div className="border-t border-gray-200 my-4 sm:my-6"></div>
