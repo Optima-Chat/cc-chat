@@ -42,7 +42,7 @@ export default function Header() {
           </a>
           <Link
             href="/create"
-            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition text-sm font-medium"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -51,7 +51,7 @@ export default function Header() {
           </Link>
           <Link
             href="/create"
-            className="sm:hidden text-blue-600 hover:text-blue-700 transition"
+            className="sm:hidden text-gray-900 hover:text-gray-700 transition"
             title="发帖"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
