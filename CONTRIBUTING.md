@@ -251,25 +251,23 @@ Fixes #(issue 编号)
 
 ## 📦 发布流程
 
-发布由维护者完成：
+CC Chat 使用 **自动化发布**，发布由维护者完成：
 
-1. 更新版本号
 ```bash
-cd cli && npm version patch/minor/major
+# 1. 更新版本号（会自动创建 git tag）
+cd cli
+npm version patch  # 或 minor、major
+
+# 2. 推送代码和标签
+git push && git push --tags
+
+# 3. 等待 GitHub Actions 自动完成：
+#    - 发布到 npm
+#    - 创建 GitHub Release
+#    - 生成 changelog
 ```
 
-2. 构建
-```bash
-npm run build
-```
-
-3. 发布到 npm
-```bash
-npm publish
-```
-
-4. 创建 GitHub Release
-5. 更新文档
+详细步骤和配置请查看 [发布指南](./docs/release-guide.md)
 
 ## 💬 交流讨论
 
