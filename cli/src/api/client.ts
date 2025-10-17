@@ -76,6 +76,13 @@ class ApiClient {
     });
     return response.data;
   }
+
+  async votePost(postId: string, value: 1 | -1) {
+    const response = await this.client.post(`/api/posts/${postId}/vote`, {
+      value,
+    });
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();

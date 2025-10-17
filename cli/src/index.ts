@@ -8,6 +8,7 @@ import { browse } from './commands/browse.js';
 import { search } from './commands/search.js';
 import { login } from './commands/login.js';
 import { comment } from './commands/comment.js';
+import { vote } from './commands/vote.js';
 
 const program = new Command();
 
@@ -46,6 +47,16 @@ program
   .description('评论帖子')
   .option('-t, --text <text>', '评论内容')
   .action(comment);
+
+program
+  .command('upvote <post-id>')
+  .description('给帖子点赞')
+  .action((postId) => vote(postId, 1));
+
+program
+  .command('downvote <post-id>')
+  .description('给帖子踩')
+  .action((postId) => vote(postId, -1));
 
 program
   .command('login')
