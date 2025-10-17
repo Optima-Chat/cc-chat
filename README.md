@@ -139,37 +139,58 @@ cc-chat mark-read <notification-id>
 
 ```mermaid
 graph TB
-    subgraph "用户交互层"
+    subgraph Client["🖥️ 客户端"]
         Claude["🤖 Claude<br/>(自然语言)"]
-        Web["🌐 Web UI<br/>(Next.js 15)"]
-        CLI["💻 CLI<br/>(TypeScript)"]
+        Web["🌐 Web<br/>(Next.js 15)"]
+        CLI["💻 CLI<br/>(Commander.js)"]
     end
 
-    subgraph "API 层"
-        API["⚡ Fastify API<br/>(TypeScript)"]
+    subgraph Backend["⚡ 后端服务"]
+        API["Fastify API<br/>(TypeScript)"]
+        DB[(PostgreSQL<br/>数据存储)]
     end
 
-    subgraph "数据层"
-        DB[(🗄️ PostgreSQL<br/>数据存储)]
-        Cache[(⚡ Redis<br/>缓存)]
-        Reddit[📡 Reddit<br/>内容同步]
+    subgraph Automation["🤖 内容同步 (GitHub Actions)"]
+        Sync["Python 脚本<br/>(每 6 小时)"]
+        Reddit[Reddit API<br/>内容抓取]
+        OpenAI[OpenAI API<br/>智能翻译]
     end
 
-    Claude --> API
-    Web --> API
+    subgraph Auth["🔐 认证"]
+        GitHub[GitHub OAuth]
+    end
+
+    subgraph Deploy["☁️ 部署平台"]
+        Railway[Railway<br/>API 托管]
+        Vercel[Vercel<br/>Web 托管]
+    end
+
+    Claude --> CLI
     CLI --> API
+    Web --> API
 
     API --> DB
-    API --> Cache
-    API --> Reddit
+    API --> GitHub
+
+    Sync --> Reddit
+    Reddit --> OpenAI
+    OpenAI --> Sync
+    Sync --> API
+
+    API --> Railway
+    Web --> Vercel
 
     style Claude fill:#8b5cf6,stroke:#7c3aed,color:#fff
     style Web fill:#3b82f6,stroke:#2563eb,color:#fff
     style CLI fill:#10b981,stroke:#059669,color:#fff
     style API fill:#f59e0b,stroke:#d97706,color:#fff
     style DB fill:#ef4444,stroke:#dc2626,color:#fff
-    style Cache fill:#ec4899,stroke:#db2777,color:#fff
+    style Sync fill:#ec4899,stroke:#db2777,color:#fff
     style Reddit fill:#f97316,stroke:#ea580c,color:#fff
+    style OpenAI fill:#06b6d4,stroke:#0891b2,color:#fff
+    style GitHub fill:#6366f1,stroke:#4f46e5,color:#fff
+    style Railway fill:#0f172a,stroke:#1e293b,color:#fff
+    style Vercel fill:#000000,stroke:#171717,color:#fff
 ```
 
 **技术栈：**
