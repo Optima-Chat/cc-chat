@@ -3,15 +3,22 @@ import { apiClient } from '../api/client.js';
 
 interface BrowseOptions {
   limit?: string;
+  tag?: string;
+  sort?: string;
 }
 
 export async function browse(options: BrowseOptions) {
   try {
     const limit = parseInt(options.limit || '10', 10);
+    const { tag, sort } = options;
 
-    console.log(chalk.cyan('📖 正在加载帖子...\n'));
+    let loadingText = '📖 正在加载帖子...';
+    if (tag) {
+      loadingText = `📖 正在加载标签「${tag}」的帖子...`;
+    }
+    console.log(chalk.cyan(loadingText + '\n'));
 
-    const posts = await apiClient.getPosts(limit);
+    const posts = await apiClient.getPosts(limit, tag, sort);
 
     if (!posts || posts.length === 0) {
       console.log(chalk.yellow('暂无帖子'));
@@ -22,6 +29,13 @@ export async function browse(options: BrowseOptions) {
 
     posts.forEach((post: any, index: number) => {
       console.log(chalk.cyan(`[${index + 1}] ${post.title}`));
+
+      // 显示标签
+      if (post.tags && post.tags.length > 0) {
+        const tagsText = post.tags.map((tag: any) => `${tag.emoji}${tag.name}`).join(' ');
+        console.log(chalk.gray(`    ${tagsText}`));
+      }
+
       console.log(chalk.gray(`    ID: ${post.id} | 作者: ${post.author?.username || '未知'} | ${formatDate(post.created_at)}`));
 
       // 显示摘要

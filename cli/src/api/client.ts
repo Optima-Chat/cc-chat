@@ -22,18 +22,30 @@ class ApiClient {
     });
   }
 
-  async createPost(title: string, content: string) {
+  async createPost(title: string, content: string, tag_ids?: number[]) {
     const response = await this.client.post('/api/posts', {
       title,
       content,
+      tag_ids,
     });
     return response.data;
   }
 
-  async getPosts(limit: number = 10) {
-    const response = await this.client.get('/api/posts', {
-      params: { limit },
-    });
+  async getPosts(limit: number = 10, tag?: string, sort?: string) {
+    const params: any = { limit };
+    if (tag) {
+      // 查找标签 ID
+      const tagsResponse = await this.client.get('/api/tags');
+      const tags = tagsResponse.data;
+      const matchedTag = tags.find((t: any) => t.name === tag);
+      if (matchedTag) {
+        params.tag = matchedTag.id;
+      }
+    }
+    if (sort) {
+      params.sort = sort;
+    }
+    const response = await this.client.get('/api/posts', { params });
     return response.data;
   }
 
@@ -150,6 +162,11 @@ class ApiClient {
 
   async checkBookmark(postId: string) {
     const response = await this.client.get(`/api/bookmarks/check/${postId}`);
+    return response.data;
+  }
+
+  async getTags() {
+    const response = await this.client.get('/api/tags');
     return response.data;
   }
 }

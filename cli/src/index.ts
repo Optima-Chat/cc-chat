@@ -13,13 +13,14 @@ import { vote, voteComment } from './commands/vote.js';
 import { deletePost, deleteComment } from './commands/delete.js';
 import { notifications, getUnreadCount, markNotificationRead, markAllNotificationsRead } from './commands/notifications.js';
 import { savePost, unsavePost, getSavedPosts } from './commands/bookmarks.js';
+import { listTags } from './commands/tags.js';
 
 const program = new Command();
 
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.12.0');
+  .version('0.13.0');
 
 program
   .command('setup-claude')
@@ -32,13 +33,21 @@ program
   .description('发布新帖子')
   .option('-t, --title <title>', '帖子标题')
   .option('-c, --content <content>', '帖子内容')
+  .option('--tags <tags>', '标签（逗号分隔，如：技巧,MCP）')
   .action(post);
 
 program
   .command('browse')
   .description('浏览帖子列表')
   .option('-l, --limit <number>', '显示数量', '10')
+  .option('--tag <tag>', '按标签筛选')
+  .option('--sort <sort>', '排序方式 (hot/new/top/comments)', 'new')
   .action(browse);
+
+program
+  .command('tags')
+  .description('查看所有可用标签')
+  .action(listTags);
 
 program
   .command('search [query]')
