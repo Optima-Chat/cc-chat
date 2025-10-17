@@ -5,6 +5,11 @@ import { setupClaude } from './commands/setup-claude.js';
 // 静默更新 CLAUDE.md
 async function postinstall() {
   try {
+    // CI 环境跳过
+    if (process.env.CI === 'true') {
+      process.exit(0);
+    }
+
     // 检测是否是全局安装
     const isGlobal = process.env.npm_config_global === 'true';
 
