@@ -104,7 +104,9 @@ function CommentItem({
         </button>
       ) : (
         <>
-          <p className="text-sm sm:text-base text-gray-700 whitespace-pre-wrap mb-2">{comment.content}</p>
+          <div className="text-sm sm:text-base text-gray-700 mb-2">
+            <MarkdownContent content={comment.content} />
+          </div>
           <div className="flex items-center gap-2 flex-wrap">
             {/* Upvote */}
             <button
