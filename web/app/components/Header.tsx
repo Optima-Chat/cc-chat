@@ -41,6 +41,24 @@ export default function Header() {
             </svg>
           </a>
           <Link
+            href="/create"
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            发帖
+          </Link>
+          <Link
+            href="/create"
+            className="sm:hidden text-blue-600 hover:text-blue-700 transition"
+            title="发帖"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+          </Link>
+          <Link
             href="/saved"
             className="text-gray-600 hover:text-gray-900 transition"
             title="我的收藏"
