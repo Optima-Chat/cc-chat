@@ -273,6 +273,8 @@ export default function PostDetail() {
   const [collapsedComments, setCollapsedComments] = useState<Set<number>>(new Set())
   const [replyingTo, setReplyingTo] = useState<number | null>(null)
   const [replyText, setReplyText] = useState('')
+  const [bookmarked, setBookmarked] = useState(false)
+  const [bookmarking, setBookmarking] = useState(false)
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -334,6 +336,17 @@ export default function PostDetail() {
             .filter((c: Comment) => (c.upvotes - c.downvotes) < -5)
             .map((c: Comment) => c.id)
           setCollapsedComments(new Set(negativeCommentIds))
+        }
+
+        // 检查收藏状态（仅登录用户）
+        if (token) {
+          const bookmarkRes = await fetch(`https://api.cc-chat.dev/api/bookmarks/check/${params.id}`, {
+            headers,
+          })
+          if (bookmarkRes.ok) {
+            const bookmarkData = await bookmarkRes.json()
+            setBookmarked(bookmarkData.bookmarked)
+          }
         }
       } catch (error) {
         console.error('Failed to fetch post:', error)
@@ -627,6 +640,40 @@ export default function PostDetail() {
     }
   }
 
+  const handleBookmark = async () => {
+    if (!isLoggedIn) {
+      alert('请先登录')
+      return
+    }
+
+    setBookmarking(true)
+
+    try {
+      const token = localStorage.getItem('cc_token')
+      const method = bookmarked ? 'DELETE' : 'POST'
+      const res = await fetch(`https://api.cc-chat.dev/api/bookmarks/${params.id}`, {
+        method,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: method === 'POST' ? JSON.stringify({}) : undefined,
+      })
+
+      if (res.ok) {
+        setBookmarked(!bookmarked)
+      } else {
+        const errorData = await res.json().catch(() => ({ message: '未知错误' }))
+        alert(errorData.message || '操作失败')
+      }
+    } catch (error) {
+      console.error('Failed to bookmark:', error)
+      alert('操作失败，请重试')
+    } finally {
+      setBookmarking(false)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
@@ -791,6 +838,28 @@ export default function PostDetail() {
               <div className="text-gray-700 mb-6 sm:mb-8">
                 <MarkdownContent content={post.content} />
               </div>
+
+              {/* 操作按钮 */}
+              {isLoggedIn && (
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={handleBookmark}
+                    disabled={bookmarking}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
+                      bookmarked
+                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  >
+                    <svg className="w-5 h-5" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                    </svg>
+                    <span className="text-sm font-medium">
+                      {bookmarking ? '处理中...' : bookmarked ? '已收藏' : '收藏'}
+                    </span>
+                  </button>
+                </div>
+              )}
 
               {/* 评论区分隔线 */}
               <div className="border-t border-gray-200 my-4 sm:my-6"></div>
