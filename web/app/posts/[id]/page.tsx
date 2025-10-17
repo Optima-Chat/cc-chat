@@ -523,12 +523,78 @@ export default function PostDetail() {
   if (loading) {
     return (
       <div className="animate-pulse">
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="h-8 bg-gray-200 rounded w-3/4 mb-4"></div>
-          <div className="space-y-2">
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded"></div>
-            <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+        <div className="bg-white rounded-lg shadow-sm">
+          <div className="flex">
+            {/* 投票区域 Skeleton */}
+            <div className="p-2 sm:p-4 bg-gray-50 rounded-l-lg w-16 sm:w-20">
+              <div className="flex flex-col items-center gap-2">
+                <div className="w-6 h-6 bg-gray-300 rounded"></div>
+                <div className="w-8 h-6 bg-gray-300 rounded"></div>
+                <div className="w-6 h-6 bg-gray-300 rounded"></div>
+              </div>
+            </div>
+
+            {/* 主内容区域 Skeleton */}
+            <div className="flex-1 p-4 sm:p-6">
+              {/* 标签 Skeleton */}
+              <div className="flex gap-2 mb-3">
+                <div className="h-6 bg-gray-200 rounded w-16"></div>
+                <div className="h-6 bg-gray-200 rounded w-20"></div>
+              </div>
+
+              {/* 标题 Skeleton */}
+              <div className="h-7 sm:h-8 bg-gray-200 rounded w-3/4 mb-3"></div>
+
+              {/* 元信息 Skeleton */}
+              <div className="flex gap-2 mb-4 sm:mb-6">
+                <div className="h-4 bg-gray-200 rounded w-24"></div>
+                <div className="h-4 bg-gray-200 rounded w-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-16"></div>
+                <div className="h-4 bg-gray-200 rounded w-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-20"></div>
+              </div>
+
+              {/* 内容 Skeleton */}
+              <div className="space-y-2 mb-6 sm:mb-8">
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+              </div>
+
+              {/* 分隔线 */}
+              <div className="border-t border-gray-200 my-4 sm:my-6"></div>
+
+              {/* 评论输入框 Skeleton */}
+              <div className="mb-6 sm:mb-8">
+                <div className="h-20 bg-gray-200 rounded-lg mb-2"></div>
+                <div className="flex justify-end">
+                  <div className="h-9 bg-gray-200 rounded-lg w-24"></div>
+                </div>
+              </div>
+
+              {/* 评论标题 Skeleton */}
+              <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+
+              {/* 评论列表 Skeleton */}
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="border-l-2 border-gray-200 pl-3 sm:pl-4 py-2">
+                    <div className="flex gap-2 mb-2">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                      <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    </div>
+                    <div className="h-4 bg-gray-200 rounded w-full mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="flex gap-2">
+                      <div className="h-6 bg-gray-200 rounded w-12"></div>
+                      <div className="h-6 bg-gray-200 rounded w-12"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
