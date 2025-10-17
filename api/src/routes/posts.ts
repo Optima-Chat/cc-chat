@@ -232,19 +232,46 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
 
     const result = await pool.query(
       `SELECT
-        c.id, c.content, c.upvotes, c.created_at, c.parent_id,
+        c.id, c.content, c.upvotes, c.downvotes, c.created_at, c.parent_id,
         u.id as user_id, u.username, u.avatar_url
       FROM comments c
       LEFT JOIN users u ON c.user_id = u.id
       WHERE c.post_id = $1
-      ORDER BY c.created_at ASC`,
+      ORDER BY (c.upvotes - COALESCE(c.downvotes, 0)) DESC, c.created_at ASC`,
       [id]
     );
+
+    // 获取当前用户的投票状态（如果已登录）
+    let currentUserId: number | null = null;
+    const authHeader = request.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const userResult = await pool.query(
+        'SELECT id FROM users WHERE github_id = $1',
+        [token]
+      );
+      if (userResult.rows.length > 0) {
+        currentUserId = userResult.rows[0].id;
+      }
+    }
+
+    let votesByComment = new Map<number, number>();
+    const commentIds = result.rows.map((row) => row.id);
+    if (currentUserId && commentIds.length > 0) {
+      const votesResult = await pool.query(
+        `SELECT comment_id, value FROM comment_votes WHERE user_id = $1 AND comment_id = ANY($2)`,
+        [currentUserId, commentIds]
+      );
+      votesResult.rows.forEach((row: any) => {
+        votesByComment.set(row.comment_id, row.value);
+      });
+    }
 
     const comments = result.rows.map((row) => ({
       id: row.id,
       content: row.content,
       upvotes: row.upvotes,
+      downvotes: row.downvotes || 0,
       parent_id: row.parent_id,
       created_at: row.created_at,
       author: {
@@ -252,6 +279,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
         username: row.username,
         avatar_url: row.avatar_url,
       },
+      user_vote: votesByComment.get(row.id) || null,
     }));
 
     return comments;
@@ -385,8 +413,8 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
     const { id } = request.params as { id: string };
     const { value } = request.body as { value: number };
 
-    if (value !== 1) {
-      return reply.status(400).send({ message: 'value 必须是 1（评论只支持点赞）' });
+    if (value !== 1 && value !== -1) {
+      return reply.status(400).send({ message: 'value 必须是 1 或 -1' });
     }
 
     try {
@@ -396,37 +424,65 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
         return reply.status(404).send({ message: '评论不存在' });
       }
 
-      // 确保 comment_votes 表存在
+      // 确保 comment_votes 表存在并支持 downvote
       await pool.query(`
         CREATE TABLE IF NOT EXISTS comment_votes (
           id SERIAL PRIMARY KEY,
           user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
           comment_id INTEGER NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
-          value INTEGER NOT NULL DEFAULT 1 CHECK (value = 1),
+          value INTEGER NOT NULL CHECK (value IN (-1, 1)),
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           UNIQUE(user_id, comment_id)
         )
       `);
 
+      // 确保 comments 表有 downvotes 字段
+      await pool.query(`
+        ALTER TABLE comments ADD COLUMN IF NOT EXISTS downvotes INTEGER DEFAULT 0
+      `);
+
       // 检查是否已经投过票
       const existingVote = await pool.query(
-        'SELECT id FROM comment_votes WHERE user_id = $1 AND comment_id = $2',
+        'SELECT id, value FROM comment_votes WHERE user_id = $1 AND comment_id = $2',
         [request.user!.id, id]
       );
 
       if (existingVote.rows.length > 0) {
-        // 取消点赞
-        await pool.query('DELETE FROM comment_votes WHERE user_id = $1 AND comment_id = $2', [request.user!.id, id]);
-        await pool.query('UPDATE comments SET upvotes = upvotes - 1 WHERE id = $1', [id]);
-        return { message: '已取消点赞' };
+        const oldValue = existingVote.rows[0].value;
+        if (oldValue === value) {
+          // 取消投票
+          await pool.query('DELETE FROM comment_votes WHERE user_id = $1 AND comment_id = $2', [request.user!.id, id]);
+          await pool.query(
+            `UPDATE comments SET ${value === 1 ? 'upvotes' : 'downvotes'} = ${value === 1 ? 'upvotes' : 'downvotes'} - 1 WHERE id = $1`,
+            [id]
+          );
+          return { message: '已取消投票' };
+        } else {
+          // 改变投票方向
+          await pool.query(
+            'UPDATE comment_votes SET value = $1 WHERE user_id = $2 AND comment_id = $3',
+            [value, request.user!.id, id]
+          );
+          await pool.query(
+            `UPDATE comments SET
+              upvotes = upvotes + $1,
+              downvotes = downvotes + $2
+            WHERE id = $3`,
+            [value === 1 ? 1 : -1, value === -1 ? 1 : -1, id]
+          );
+          return { message: '投票已更新' };
+        }
       } else {
-        // 新点赞
+        // 新投票
         await pool.query(
           'INSERT INTO comment_votes (user_id, comment_id, value) VALUES ($1, $2, $3)',
           [request.user!.id, id, value]
         );
-        await pool.query('UPDATE comments SET upvotes = upvotes + 1 WHERE id = $1', [id]);
-        return { message: '点赞成功' };
+        await pool.query(
+          `UPDATE comments SET ${value === 1 ? 'upvotes' : 'downvotes'} = ${value === 1 ? 'upvotes' : 'downvotes'} + 1 WHERE id = $1`,
+          [id]
+        );
+        return { message: '投票成功' };
       }
     } catch (error: any) {
       fastify.log.error('Comment vote error:', error);
