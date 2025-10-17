@@ -1,7 +1,16 @@
 import { FastifyPluginAsync } from 'fastify';
 import { pool } from '../db.js';
+import { authenticate, AuthRequest } from '../middleware/auth.js';
 
 export const authRoutes: FastifyPluginAsync = async (fastify) => {
+  // 获取当前登录用户信息
+  fastify.get('/me', { preHandler: authenticate }, async (request: AuthRequest, reply) => {
+    return {
+      id: request.user!.id,
+      username: request.user!.username,
+    };
+  });
+
   // GitHub OAuth 回调处理
   fastify.post('/github/callback', async (request, reply) => {
     const { code } = request.body as { code: string };

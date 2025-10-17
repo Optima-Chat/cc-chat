@@ -23,6 +23,7 @@ interface Post {
   comment_count: number
   user_vote: 1 | -1 | 0 | null
   tags?: Array<{ id: number; name: string; emoji: string }>
+  deleted_at?: string | null
 }
 
 interface Comment {
@@ -39,12 +40,14 @@ interface Comment {
   created_at: string
   user_vote?: number
   replies: Comment[]
+  deleted_at?: string | null
 }
 
 interface CommentItemProps {
   comment: Comment
   depth: number
   isLoggedIn: boolean
+  currentUsername: string | null
   collapsedComments: Set<number>
   replyingTo: number | null
   replyText: string
@@ -54,6 +57,7 @@ interface CommentItemProps {
   setReplyText: React.Dispatch<React.SetStateAction<string>>
   handleCommentVote: (commentId: number, value: 1 | -1) => void
   handleReply: (e: React.FormEvent, parentId: number) => void
+  handleDeleteComment: (commentId: number) => void
   formatDate: (dateString: string) => string
 }
 
@@ -61,6 +65,7 @@ function CommentItem({
   comment,
   depth,
   isLoggedIn,
+  currentUsername,
   collapsedComments,
   replyingTo,
   replyText,
@@ -70,6 +75,7 @@ function CommentItem({
   setReplyText,
   handleCommentVote,
   handleReply,
+  handleDeleteComment,
   formatDate,
 }: CommentItemProps) {
   const score = comment.upvotes - comment.downvotes
@@ -144,7 +150,7 @@ function CommentItem({
             </button>
 
             {/* Reply button */}
-            {depth < maxDepth && (
+            {depth < maxDepth && !comment.deleted_at && (
               <button
                 onClick={() => {
                   if (!isLoggedIn) {
@@ -157,6 +163,20 @@ function CommentItem({
                 className="text-xs sm:text-sm text-gray-500 hover:text-blue-600 ml-2"
               >
                 回复
+              </button>
+            )}
+
+            {/* Delete button */}
+            {currentUsername === comment.author.username && !comment.deleted_at && (
+              <button
+                onClick={() => {
+                  if (window.confirm('确定要删除这条评论吗？')) {
+                    handleDeleteComment(comment.id)
+                  }
+                }}
+                className="text-xs sm:text-sm text-red-500 hover:text-red-700 ml-2"
+              >
+                删除
               </button>
             )}
 
@@ -218,6 +238,7 @@ function CommentItem({
                   comment={reply}
                   depth={depth + 1}
                   isLoggedIn={isLoggedIn}
+                  currentUsername={currentUsername}
                   collapsedComments={collapsedComments}
                   replyingTo={replyingTo}
                   replyText={replyText}
@@ -227,6 +248,7 @@ function CommentItem({
                   setReplyText={setReplyText}
                   handleCommentVote={handleCommentVote}
                   handleReply={handleReply}
+                  handleDeleteComment={handleDeleteComment}
                   formatDate={formatDate}
                 />
               ))}
@@ -247,13 +269,32 @@ export default function PostDetail() {
   const [commentText, setCommentText] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [currentUsername, setCurrentUsername] = useState<string | null>(null)
   const [collapsedComments, setCollapsedComments] = useState<Set<number>>(new Set())
   const [replyingTo, setReplyingTo] = useState<number | null>(null)
   const [replyText, setReplyText] = useState('')
 
   useEffect(() => {
-    const token = localStorage.getItem('cc_token')
-    setIsLoggedIn(!!token)
+    const fetchCurrentUser = async () => {
+      const token = localStorage.getItem('cc_token')
+      setIsLoggedIn(!!token)
+
+      if (token) {
+        try {
+          const res = await fetch('https://api.cc-chat.dev/api/auth/me', {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (res.ok) {
+            const user = await res.json()
+            setCurrentUsername(user.username)
+          }
+        } catch (error) {
+          console.error('Failed to fetch current user:', error)
+        }
+      }
+    }
+
+    fetchCurrentUser()
   }, [])
 
   useEffect(() => {
@@ -507,6 +548,85 @@ export default function PostDetail() {
     }
   }
 
+  const handleDeletePost = async () => {
+    if (!isLoggedIn) {
+      alert('请先登录')
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('cc_token')
+      const res = await fetch(`https://api.cc-chat.dev/api/posts/${params.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (res.ok) {
+        alert('帖子已删除')
+        router.push('/')
+      } else {
+        const errorData = await res.json().catch(() => ({ message: '未知错误' }))
+        alert(`删除失败: ${errorData.message || '请重试'}`)
+      }
+    } catch (error) {
+      console.error('Failed to delete post:', error)
+      alert('删除失败，请重试')
+    }
+  }
+
+  const handleDeleteComment = async (commentId: number) => {
+    if (!isLoggedIn) {
+      alert('请先登录')
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('cc_token')
+      const res = await fetch(`https://api.cc-chat.dev/api/posts/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (res.ok) {
+        // 递归更新评论树，将已删除的评论标记为删除
+        const updateCommentTree = (comments: Comment[]): Comment[] => {
+          return comments.map(comment => {
+            if (comment.id === commentId) {
+              return {
+                ...comment,
+                content: '[已删除]',
+                deleted_at: new Date().toISOString(),
+                author: {
+                  ...comment.author,
+                  username: '[已删除]',
+                  avatar_url: null,
+                }
+              }
+            } else if (comment.replies.length > 0) {
+              return {
+                ...comment,
+                replies: updateCommentTree(comment.replies)
+              }
+            }
+            return comment
+          })
+        }
+
+        setComments(updateCommentTree(comments))
+      } else {
+        const errorData = await res.json().catch(() => ({ message: '未知错误' }))
+        alert(`删除失败: ${errorData.message || '请重试'}`)
+      }
+    } catch (error) {
+      console.error('Failed to delete comment:', error)
+      alert('删除失败，请重试')
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString)
     const now = new Date()
@@ -648,6 +768,23 @@ export default function PostDetail() {
                 <span>{formatDate(post.created_at)}</span>
                 <span>•</span>
                 <span>{post.comment_count} 条评论</span>
+
+                {/* Delete button for post author */}
+                {currentUsername === post.author.username && !post.deleted_at && (
+                  <>
+                    <span>•</span>
+                    <button
+                      onClick={() => {
+                        if (window.confirm('确定要删除这个帖子吗？删除后将无法恢复。')) {
+                          handleDeletePost()
+                        }
+                      }}
+                      className="text-red-500 hover:text-red-700 font-medium"
+                    >
+                      删除
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* 内容 */}
@@ -701,6 +838,7 @@ export default function PostDetail() {
                       comment={comment}
                       depth={0}
                       isLoggedIn={isLoggedIn}
+                      currentUsername={currentUsername}
                       collapsedComments={collapsedComments}
                       replyingTo={replyingTo}
                       replyText={replyText}
@@ -710,6 +848,7 @@ export default function PostDetail() {
                       setReplyText={setReplyText}
                       handleCommentVote={handleCommentVote}
                       handleReply={handleReply}
+                      handleDeleteComment={handleDeleteComment}
                       formatDate={formatDate}
                     />
                   ))

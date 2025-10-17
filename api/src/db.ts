@@ -39,7 +39,8 @@ export async function initDb() {
         upvotes INTEGER DEFAULT 0,
         downvotes INTEGER DEFAULT 0,
         comment_count INTEGER DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP DEFAULT NULL
       );
 
       CREATE TABLE IF NOT EXISTS comments (
@@ -49,7 +50,8 @@ export async function initDb() {
         content TEXT NOT NULL,
         parent_id INTEGER REFERENCES comments(id) ON DELETE CASCADE,
         upvotes INTEGER DEFAULT 0,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        deleted_at TIMESTAMP DEFAULT NULL
       );
 
       CREATE TABLE IF NOT EXISTS votes (
@@ -98,6 +100,14 @@ export async function initDb() {
         END IF;
         IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='comments' AND column_name='upvotes') THEN
           ALTER TABLE comments ADD COLUMN upvotes INTEGER DEFAULT 0;
+        END IF;
+
+        -- 添加 deleted_at 字段
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='posts' AND column_name='deleted_at') THEN
+          ALTER TABLE posts ADD COLUMN deleted_at TIMESTAMP DEFAULT NULL;
+        END IF;
+        IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='comments' AND column_name='deleted_at') THEN
+          ALTER TABLE comments ADD COLUMN deleted_at TIMESTAMP DEFAULT NULL;
         END IF;
       END $$;
     `);

@@ -150,7 +150,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
 
     const result = await pool.query(
       `SELECT
-        p.id, p.title, p.content, p.created_at,
+        p.id, p.title, p.content, p.created_at, p.deleted_at,
         p.upvotes, p.downvotes, p.comment_count,
         u.id as user_id, u.username, u.avatar_url
       FROM posts p
@@ -163,6 +163,9 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(404).send({ message: '帖子不存在' });
     }
 
+    const row = result.rows[0];
+    const isDeleted = row.deleted_at !== null;
+
     // 获取标签
     const tagsResult = await pool.query(
       `SELECT t.id, t.name, t.emoji
@@ -172,19 +175,19 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       [id]
     );
 
-    const row = result.rows[0];
     return {
       id: row.id,
-      title: row.title,
-      content: row.content,
+      title: isDeleted ? '[已删除]' : row.title,
+      content: isDeleted ? '[已删除]' : row.content,
       upvotes: row.upvotes,
       downvotes: row.downvotes,
       comment_count: row.comment_count,
       created_at: row.created_at,
+      deleted_at: row.deleted_at,
       author: {
         id: row.user_id,
-        username: row.username,
-        avatar_url: row.avatar_url,
+        username: isDeleted ? '[已删除]' : row.username,
+        avatar_url: isDeleted ? null : row.avatar_url,
       },
       tags: tagsResult.rows,
     };
@@ -232,7 +235,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
 
     const result = await pool.query(
       `SELECT
-        c.id, c.content, c.upvotes, c.downvotes, c.created_at, c.parent_id,
+        c.id, c.content, c.upvotes, c.downvotes, c.created_at, c.parent_id, c.deleted_at,
         u.id as user_id, u.username, u.avatar_url
       FROM comments c
       LEFT JOIN users u ON c.user_id = u.id
@@ -275,6 +278,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       downvotes: number;
       parent_id: number | null;
       created_at: Date;
+      deleted_at: Date | null;
       author: {
         id: number;
         username: string;
@@ -289,17 +293,20 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
 
     // 第一遍：创建所有评论对象
     result.rows.forEach((row) => {
+      const isDeleted = row.deleted_at !== null;
+
       const comment: CommentNode = {
         id: row.id,
-        content: row.content,
+        content: isDeleted ? '[已删除]' : row.content,
         upvotes: row.upvotes,
         downvotes: row.downvotes || 0,
         parent_id: row.parent_id,
         created_at: row.created_at,
+        deleted_at: row.deleted_at,
         author: {
           id: row.user_id,
-          username: row.username,
-          avatar_url: row.avatar_url,
+          username: isDeleted ? '[已删除]' : row.username,
+          avatar_url: isDeleted ? null : row.avatar_url,
         },
         user_vote: votesByComment.get(row.id) || null,
         replies: [],
@@ -557,6 +564,70 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
     } catch (error: any) {
       fastify.log.error('Comment vote error:', error);
       return reply.status(500).send({ message: error.message || '投票失败' });
+    }
+  });
+
+  // 删除帖子（需要认证）
+  fastify.delete('/:id', { preHandler: authenticate }, async (request: AuthRequest, reply) => {
+    const { id } = request.params as { id: string };
+
+    try {
+      // 检查帖子是否存在以及是否为作者
+      const postCheck = await pool.query(
+        'SELECT user_id FROM posts WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+
+      if (postCheck.rows.length === 0) {
+        return reply.status(404).send({ message: '帖子不存在或已删除' });
+      }
+
+      if (postCheck.rows[0].user_id !== request.user!.id) {
+        return reply.status(403).send({ message: '无权删除此帖子' });
+      }
+
+      // 软删除：设置 deleted_at
+      await pool.query(
+        'UPDATE posts SET deleted_at = NOW() WHERE id = $1',
+        [id]
+      );
+
+      return { message: '帖子已删除' };
+    } catch (error: any) {
+      fastify.log.error('Delete post error:', error);
+      return reply.status(500).send({ message: error.message || '删除失败' });
+    }
+  });
+
+  // 删除评论（需要认证）
+  fastify.delete('/comments/:id', { preHandler: authenticate }, async (request: AuthRequest, reply) => {
+    const { id } = request.params as { id: string };
+
+    try {
+      // 检查评论是否存在以及是否为作者
+      const commentCheck = await pool.query(
+        'SELECT user_id, post_id FROM comments WHERE id = $1 AND deleted_at IS NULL',
+        [id]
+      );
+
+      if (commentCheck.rows.length === 0) {
+        return reply.status(404).send({ message: '评论不存在或已删除' });
+      }
+
+      if (commentCheck.rows[0].user_id !== request.user!.id) {
+        return reply.status(403).send({ message: '无权删除此评论' });
+      }
+
+      // 软删除：设置 deleted_at
+      await pool.query(
+        'UPDATE comments SET deleted_at = NOW() WHERE id = $1',
+        [id]
+      );
+
+      return { message: '评论已删除' };
+    } catch (error: any) {
+      fastify.log.error('Delete comment error:', error);
+      return reply.status(500).send({ message: error.message || '删除失败' });
     }
   });
 };
