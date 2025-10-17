@@ -9,7 +9,7 @@
 ### 技术栈
 
 - **爬虫**: Python + PRAW (Reddit API)
-- **翻译**: OpenAI API (gpt-4o-mini)
+- **翻译**: OpenAI API (gpt-4.1-mini)
 - **发布**: CC Chat API
 - **调度**: GitHub Actions (每 6 小时)
 - **存储**: JSON 文件去重（或 Redis）
@@ -67,7 +67,7 @@ data/
 ### OpenAI 配置
 
 ```python
-model = "gpt-4o-mini"  # 经济实惠
+model = "gpt-4.1-mini"  # 经济实惠
 prompt = """
 将以下英文内容翻译为中文。要求：
 1. 保留所有代码块和技术术语（如 MCP, Claude Code）
@@ -80,7 +80,7 @@ prompt = """
 ```
 
 **成本估算:**
-- gpt-4o-mini: $0.15 / 1M input tokens
+- gpt-4.1-mini: $0.15 / 1M input tokens
 - 平均帖子 ~1000 tokens
 - 每天 20 篇 ≈ $0.003/天 ≈ $0.09/月
 
