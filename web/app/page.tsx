@@ -61,6 +61,7 @@ export default function Home() {
   const [selectedTag, setSelectedTag] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [searchQuery, setSearchQuery] = useState<string>('')
 
   const handleCopy = () => {
     navigator.clipboard.writeText('npm install -g @optima-chat/cc-chat@latest')
@@ -102,6 +103,10 @@ export default function Home() {
         params.append('tag', selectedTag.toString())
       }
 
+      if (searchQuery.trim()) {
+        params.append('search', searchQuery.trim())
+      }
+
       const res = await fetch(`https://api.cc-chat.dev/api/posts?${params}`, {
         cache: 'no-store',
         headers,
@@ -115,7 +120,7 @@ export default function Home() {
     }
 
     fetchPosts()
-  }, [sort, selectedTag])
+  }, [sort, selectedTag, searchQuery])
 
   const sortOptions = [
     {
@@ -196,6 +201,32 @@ export default function Home() {
 
       {/* Posts List */}
       <div className="space-y-4">
+        {/* 搜索框 */}
+        <div className="bg-white rounded-lg shadow-sm p-4">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="搜索帖子标题或内容..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
+            />
+            <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
           <h3 className="text-lg sm:text-xl font-bold text-gray-900">帖子列表</h3>
           <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 sm:pb-0">
