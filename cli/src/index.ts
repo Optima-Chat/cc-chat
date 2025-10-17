@@ -14,6 +14,7 @@ import { deletePost, deleteComment } from './commands/delete.js';
 import { notifications, getUnreadCount, markNotificationRead, markAllNotificationsRead } from './commands/notifications.js';
 import { savePost, unsavePost, getSavedPosts } from './commands/bookmarks.js';
 import { listTags } from './commands/tags.js';
+import { viewUser } from './commands/user.js';
 
 const program = new Command();
 
@@ -137,6 +138,14 @@ program
   .description('查看收藏列表')
   .option('-l, --limit <number>', '显示数量', '20')
   .action(getSavedPosts);
+
+program
+  .command('user <username>')
+  .description('查看用户主页')
+  .option('-l, --limit <number>', '显示数量', '5')
+  .option('--posts', '显示用户帖子（默认）')
+  .option('--comments', '显示用户评论')
+  .action(viewUser);
 
 program
   .command('login')

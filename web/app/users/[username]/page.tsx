@@ -37,11 +37,29 @@ interface Post {
   }>
 }
 
+interface Comment {
+  id: number
+  content: string
+  upvotes: number
+  downvotes: number
+  parent_id: number | null
+  created_at: string
+  post_id: number
+  post_title: string
+  author: {
+    id: number
+    username: string
+    avatar_url: string | null
+  }
+}
+
 export default function UserProfile() {
   const params = useParams()
   const [user, setUser] = useState<User | null>(null)
   const [posts, setPosts] = useState<Post[]>([])
+  const [comments, setComments] = useState<Comment[]>([])
   const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'posts' | 'comments'>('posts')
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -58,6 +76,13 @@ export default function UserProfile() {
         if (postsRes.ok) {
           const postsData = await postsRes.json()
           setPosts(postsData)
+        }
+
+        // 获取用户评论
+        const commentsRes = await fetch(`https://api.cc-chat.dev/api/users/${params.username}/comments`)
+        if (commentsRes.ok) {
+          const commentsData = await commentsRes.json()
+          setComments(commentsData)
         }
       } catch (error) {
         console.error('Failed to fetch user data:', error)
@@ -154,43 +179,99 @@ export default function UserProfile() {
         </div>
       </div>
 
-      {/* 用户帖子列表 */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-bold text-gray-900">发布的帖子</h2>
-
-        {posts.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-            该用户还没有发布帖子
-          </div>
-        ) : (
-          posts.map((post) => (
-            <Link key={post.id} href={`/posts/${post.id}`}>
-              <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 cursor-pointer">
-                {/* 标签 */}
-                {post.tags.length > 0 && (
-                  <div className="flex gap-2 mb-2">
-                    {post.tags.map((tag) => (
-                      <span key={tag.id} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
-                        {tag.emoji} {tag.name}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
-
-                <div className="text-sm text-gray-500 mb-4">
-                  {formatPostDate(post.created_at)} • {post.comment_count} 评论 • {post.upvotes - post.downvotes} 分
-                </div>
-
-                <div className="line-clamp-3 text-gray-700">
-                  <MarkdownContent content={post.content} className="prose-sm" />
-                </div>
-              </article>
-            </Link>
-          ))
-        )}
+      {/* Tab 切换 */}
+      <div className="border-b border-gray-200">
+        <nav className="flex gap-8">
+          <button
+            onClick={() => setActiveTab('posts')}
+            className={`pb-4 px-1 border-b-2 font-medium text-sm transition ${
+              activeTab === 'posts'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            帖子 ({posts.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('comments')}
+            className={`pb-4 px-1 border-b-2 font-medium text-sm transition ${
+              activeTab === 'comments'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            评论 ({comments.length})
+          </button>
+        </nav>
       </div>
+
+      {/* 帖子列表 */}
+      {activeTab === 'posts' && (
+        <div className="space-y-4">
+          {posts.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+              该用户还没有发布帖子
+            </div>
+          ) : (
+            posts.map((post) => (
+              <Link key={post.id} href={`/posts/${post.id}`}>
+                <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 cursor-pointer">
+                  {/* 标签 */}
+                  {post.tags.length > 0 && (
+                    <div className="flex gap-2 mb-2">
+                      {post.tags.map((tag) => (
+                        <span key={tag.id} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                          {tag.emoji} {tag.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{post.title}</h3>
+
+                  <div className="text-sm text-gray-500 mb-4">
+                    {formatPostDate(post.created_at)} • {post.comment_count} 评论 • {post.upvotes - post.downvotes} 分
+                  </div>
+
+                  <div className="line-clamp-3 text-gray-700">
+                    <MarkdownContent content={post.content} className="prose-sm" />
+                  </div>
+                </article>
+              </Link>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* 评论列表 */}
+      {activeTab === 'comments' && (
+        <div className="space-y-4">
+          {comments.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
+              该用户还没有发表评论
+            </div>
+          ) : (
+            comments.map((comment) => (
+              <Link key={comment.id} href={`/posts/${comment.post_id}`}>
+                <article className="bg-white rounded-lg shadow-sm hover:shadow-md transition p-6 cursor-pointer">
+                  <div className="mb-3">
+                    <span className="text-sm text-gray-500">评论于：</span>
+                    <span className="text-sm font-medium text-blue-600 ml-1">{comment.post_title}</span>
+                  </div>
+
+                  <div className="text-gray-700 mb-3">
+                    <MarkdownContent content={comment.content} className="prose-sm" />
+                  </div>
+
+                  <div className="text-sm text-gray-500">
+                    {formatPostDate(comment.created_at)} • {comment.upvotes - comment.downvotes} 分
+                  </div>
+                </article>
+              </Link>
+            ))
+          )}
+        </div>
+      )}
     </div>
   )
 }

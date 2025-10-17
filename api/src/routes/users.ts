@@ -123,4 +123,56 @@ export const usersRoutes: FastifyPluginAsync = async (fastify) => {
 
     return posts;
   });
+
+  // 获取用户的评论列表
+  fastify.get('/:username/comments', async (request, reply) => {
+    const { username } = request.params as { username: string };
+    const { limit = '20' } = request.query as { limit?: string };
+
+    // 获取用户 ID
+    const userResult = await pool.query(
+      `SELECT id FROM users WHERE username = $1`,
+      [username]
+    );
+
+    if (userResult.rows.length === 0) {
+      return reply.status(404).send({ message: '用户不存在' });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // 获取用户的评论
+    const commentsResult = await pool.query(
+      `SELECT
+        c.id, c.content, c.upvotes, c.downvotes, c.created_at, c.parent_id,
+        c.post_id,
+        p.title as post_title,
+        u.id as user_id, u.username, u.avatar_url
+      FROM comments c
+      LEFT JOIN users u ON c.user_id = u.id
+      LEFT JOIN posts p ON c.post_id = p.id
+      WHERE c.user_id = $1 AND c.deleted_at IS NULL
+      ORDER BY c.created_at DESC
+      LIMIT $2`,
+      [userId, parseInt(limit, 10)]
+    );
+
+    const comments = commentsResult.rows.map((row) => ({
+      id: row.id,
+      content: row.content,
+      upvotes: row.upvotes,
+      downvotes: row.downvotes,
+      parent_id: row.parent_id,
+      created_at: row.created_at,
+      post_id: row.post_id,
+      post_title: row.post_title,
+      author: {
+        id: row.user_id,
+        username: row.username,
+        avatar_url: row.avatar_url,
+      },
+    }));
+
+    return comments;
+  });
 };

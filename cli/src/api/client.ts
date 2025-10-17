@@ -169,6 +169,25 @@ class ApiClient {
     const response = await this.client.get('/api/tags');
     return response.data;
   }
+
+  async getUser(username: string) {
+    const response = await this.client.get(`/api/users/${username}`);
+    return response.data;
+  }
+
+  async getUserPosts(username: string, limit: number = 20) {
+    const response = await this.client.get(`/api/users/${username}/posts`, {
+      params: { limit },
+    });
+    return response.data;
+  }
+
+  async getUserComments(username: string, limit: number = 20) {
+    const response = await this.client.get(`/api/users/${username}/comments`, {
+      params: { limit },
+    });
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
