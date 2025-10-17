@@ -56,6 +56,14 @@ class ApiClient {
     return response.data;
   }
 
+  async replyComment(postId: string, commentId: string, text: string) {
+    const response = await this.client.post(`/api/posts/${postId}/comments`, {
+      text,
+      parent_id: parseInt(commentId, 10),
+    });
+    return response.data;
+  }
+
   async login(username: string) {
     const response = await this.client.post('/api/auth/login', {
       username,

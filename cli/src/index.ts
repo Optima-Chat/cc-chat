@@ -8,6 +8,7 @@ import { browse } from './commands/browse.js';
 import { search } from './commands/search.js';
 import { login } from './commands/login.js';
 import { comment } from './commands/comment.js';
+import { reply } from './commands/reply.js';
 import { vote, voteComment } from './commands/vote.js';
 
 const program = new Command();
@@ -15,7 +16,7 @@ const program = new Command();
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.8.0');
+  .version('0.9.0');
 
 program
   .command('setup-claude')
@@ -47,6 +48,13 @@ program
   .description('评论帖子')
   .option('-t, --text <text>', '评论内容')
   .action(comment);
+
+program
+  .command('reply <comment-id>')
+  .description('回复评论')
+  .option('-t, --text <text>', '回复内容')
+  .option('-p, --post-id <post-id>', '帖子 ID')
+  .action(reply);
 
 program
   .command('upvote <post-id>')

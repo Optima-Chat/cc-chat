@@ -237,7 +237,7 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       FROM comments c
       LEFT JOIN users u ON c.user_id = u.id
       WHERE c.post_id = $1
-      ORDER BY (c.upvotes - COALESCE(c.downvotes, 0)) DESC, c.created_at ASC`,
+      ORDER BY c.created_at ASC`,
       [id]
     );
 
@@ -267,28 +267,84 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       });
     }
 
-    const comments = result.rows.map((row) => ({
-      id: row.id,
-      content: row.content,
-      upvotes: row.upvotes,
-      downvotes: row.downvotes || 0,
-      parent_id: row.parent_id,
-      created_at: row.created_at,
+    // 构建评论对象
+    interface CommentNode {
+      id: number;
+      content: string;
+      upvotes: number;
+      downvotes: number;
+      parent_id: number | null;
+      created_at: Date;
       author: {
-        id: row.user_id,
-        username: row.username,
-        avatar_url: row.avatar_url,
-      },
-      user_vote: votesByComment.get(row.id) || null,
-    }));
+        id: number;
+        username: string;
+        avatar_url: string | null;
+      };
+      user_vote: number | null;
+      replies: CommentNode[];
+    }
 
-    return comments;
+    const commentMap = new Map<number, CommentNode>();
+    const rootComments: CommentNode[] = [];
+
+    // 第一遍：创建所有评论对象
+    result.rows.forEach((row) => {
+      const comment: CommentNode = {
+        id: row.id,
+        content: row.content,
+        upvotes: row.upvotes,
+        downvotes: row.downvotes || 0,
+        parent_id: row.parent_id,
+        created_at: row.created_at,
+        author: {
+          id: row.user_id,
+          username: row.username,
+          avatar_url: row.avatar_url,
+        },
+        user_vote: votesByComment.get(row.id) || null,
+        replies: [],
+      };
+      commentMap.set(row.id, comment);
+    });
+
+    // 第二遍：构建树状结构
+    commentMap.forEach((comment) => {
+      if (comment.parent_id === null) {
+        rootComments.push(comment);
+      } else {
+        const parent = commentMap.get(comment.parent_id);
+        if (parent) {
+          parent.replies.push(comment);
+        }
+      }
+    });
+
+    // 递归排序函数：按分数降序，时间升序
+    const sortComments = (comments: CommentNode[]) => {
+      comments.sort((a, b) => {
+        const scoreA = a.upvotes - a.downvotes;
+        const scoreB = b.upvotes - b.downvotes;
+        if (scoreA !== scoreB) {
+          return scoreB - scoreA; // 分数降序
+        }
+        return new Date(a.created_at).getTime() - new Date(b.created_at).getTime(); // 时间升序
+      });
+      comments.forEach((comment) => {
+        if (comment.replies.length > 0) {
+          sortComments(comment.replies);
+        }
+      });
+    };
+
+    sortComments(rootComments);
+
+    return rootComments;
   });
 
   // 评论帖子（需要认证）
   fastify.post('/:id/comments', { preHandler: authenticate }, async (request: AuthRequest, reply) => {
     const { id } = request.params as { id: string };
-    const { text } = request.body as { text: string };
+    const { text, parent_id } = request.body as { text: string; parent_id?: number };
 
     if (!text) {
       return reply.status(400).send({ message: '评论内容不能为空' });
@@ -300,9 +356,20 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(404).send({ message: '帖子不存在' });
     }
 
+    // 如果是回复评论，检查父评论是否存在且属于该帖子
+    if (parent_id) {
+      const parentCheck = await pool.query(
+        'SELECT id FROM comments WHERE id = $1 AND post_id = $2',
+        [parent_id, id]
+      );
+      if (parentCheck.rows.length === 0) {
+        return reply.status(404).send({ message: '父评论不存在' });
+      }
+    }
+
     const result = await pool.query(
-      'INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3) RETURNING id, created_at',
-      [id, request.user!.id, text]
+      'INSERT INTO comments (post_id, user_id, content, parent_id) VALUES ($1, $2, $3, $4) RETURNING id, created_at',
+      [id, request.user!.id, text, parent_id || null]
     );
 
     // 更新帖子评论数
@@ -322,12 +389,15 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       post_id: parseInt(id, 10),
       content: text,
       upvotes: 0,
+      downvotes: 0,
+      parent_id: parent_id || null,
       created_at: result.rows[0].created_at,
       author: {
         id: userResult.rows[0].id,
         username: userResult.rows[0].username,
         avatar_url: userResult.rows[0].avatar_url,
       },
+      replies: [],
     };
   });
 

@@ -16,6 +16,7 @@ CC Chat 是 Claude Code 用户的中文聊天社区。使用以下命令与社�
 - 浏览帖子: \`cc-chat browse --limit 10\`
 - 搜索帖子: \`cc-chat search "关键词" --limit 10\`
 - 评论: \`cc-chat comment <post-id> --text "评论内容"\`
+- 回复评论: \`cc-chat reply <comment-id> --post-id <post-id> --text "回复内容"\`
 - 帖子投票: \`cc-chat upvote <post-id>\` 或 \`cc-chat downvote <post-id>\`
 - 评论投票: \`cc-chat upvote-comment <comment-id>\` 或 \`cc-chat downvote-comment <comment-id>\`
 
