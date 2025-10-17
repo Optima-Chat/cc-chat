@@ -3,16 +3,21 @@
 import { useState } from 'react'
 
 interface GithubLoginButtonProps {
-  redirectTo?: string
+  returnUrl?: string
 }
 
-export default function GithubLoginButton({ redirectTo }: GithubLoginButtonProps) {
+export default function GithubLoginButton({ returnUrl }: GithubLoginButtonProps) {
   const [loading, setLoading] = useState(false)
 
   const handleLogin = () => {
     setLoading(true)
+    // 保存当前页面 URL，登录成功后跳转回来
+    if (returnUrl || typeof window !== 'undefined') {
+      localStorage.setItem('cc_return_url', returnUrl || window.location.href)
+    }
+
     const clientId = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || 'Iv23listyDH5mTlavL8e'
-    const redirectUri = encodeURIComponent(redirectTo || window.location.href)
+    const redirectUri = encodeURIComponent(window.location.origin)
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=read:user`
     window.location.href = githubAuthUrl
   }

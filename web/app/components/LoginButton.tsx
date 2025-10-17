@@ -62,12 +62,20 @@ export default function LoginButton() {
       setUsername(data.user.username)
       setLoading(false)
 
-      // 清除 URL 中的 code 参数
-      window.history.replaceState({}, '', window.location.pathname)
-      window.location.reload()
+      // 检查是否有返回 URL
+      const returnUrl = localStorage.getItem('cc_return_url')
+      if (returnUrl) {
+        localStorage.removeItem('cc_return_url')
+        window.location.href = returnUrl
+      } else {
+        // 清除 URL 中的 code 参数
+        window.history.replaceState({}, '', window.location.pathname)
+        window.location.reload()
+      }
     } catch (error) {
       alert('GitHub 登录失败，请重试')
       setLoading(false)
+      localStorage.removeItem('cc_return_url')
       // 清除 URL 中的 code 参数
       window.history.replaceState({}, '', window.location.pathname)
     }
