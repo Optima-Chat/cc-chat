@@ -130,6 +130,28 @@ class ApiClient {
     const response = await this.client.put('/api/notifications/read-all');
     return response.data;
   }
+
+  async bookmarkPost(postId: string) {
+    const response = await this.client.post(`/api/bookmarks/${postId}`);
+    return response.data;
+  }
+
+  async unbookmarkPost(postId: string) {
+    const response = await this.client.delete(`/api/bookmarks/${postId}`);
+    return response.data;
+  }
+
+  async getBookmarks(limit: number = 20) {
+    const response = await this.client.get('/api/bookmarks', {
+      params: { limit },
+    });
+    return response.data;
+  }
+
+  async checkBookmark(postId: string) {
+    const response = await this.client.get(`/api/bookmarks/check/${postId}`);
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();

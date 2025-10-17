@@ -12,13 +12,14 @@ import { reply } from './commands/reply.js';
 import { vote, voteComment } from './commands/vote.js';
 import { deletePost, deleteComment } from './commands/delete.js';
 import { notifications, getUnreadCount, markNotificationRead, markAllNotificationsRead } from './commands/notifications.js';
+import { savePost, unsavePost, getSavedPosts } from './commands/bookmarks.js';
 
 const program = new Command();
 
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.11.0');
+  .version('0.12.0');
 
 program
   .command('setup-claude')
@@ -111,6 +112,22 @@ program
   .command('mark-read-all')
   .description('标记所有通知为已读')
   .action(markAllNotificationsRead);
+
+program
+  .command('save <post-id>')
+  .description('收藏帖子')
+  .action(savePost);
+
+program
+  .command('unsave <post-id>')
+  .description('取消收藏')
+  .action(unsavePost);
+
+program
+  .command('saved')
+  .description('查看收藏列表')
+  .option('-l, --limit <number>', '显示数量', '20')
+  .action(getSavedPosts);
 
 program
   .command('login')

@@ -88,6 +88,14 @@ export async function initDb() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      CREATE TABLE IF NOT EXISTS bookmarks (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        post_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_id, post_id)
+      );
+
     `);
 
     // 迁移：为已存在的表添加新字段（必须在创建索引之前）
@@ -134,6 +142,8 @@ export async function initDb() {
       CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);
       CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, created_at DESC);
       CREATE INDEX IF NOT EXISTS idx_notifications_unread ON notifications(user_id, is_read) WHERE is_read = FALSE;
+      CREATE INDEX IF NOT EXISTS idx_bookmarks_user ON bookmarks(user_id, created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_bookmarks_post ON bookmarks(post_id);
     `);
 
     // 初始化默认标签
