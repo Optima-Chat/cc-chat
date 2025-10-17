@@ -10,13 +10,14 @@ import { login } from './commands/login.js';
 import { comment } from './commands/comment.js';
 import { reply } from './commands/reply.js';
 import { vote, voteComment } from './commands/vote.js';
+import { deletePost, deleteComment } from './commands/delete.js';
 
 const program = new Command();
 
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.9.0');
+  .version('0.10.0');
 
 program
   .command('setup-claude')
@@ -75,6 +76,18 @@ program
   .command('downvote-comment <comment-id>')
   .description('给评论踩')
   .action((commentId) => voteComment(commentId, -1));
+
+program
+  .command('delete-post <post-id>')
+  .description('删除帖子')
+  .option('-y, --yes', '跳过确认提示')
+  .action(deletePost);
+
+program
+  .command('delete-comment <comment-id>')
+  .description('删除评论')
+  .option('-y, --yes', '跳过确认提示')
+  .action(deleteComment);
 
 program
   .command('login')

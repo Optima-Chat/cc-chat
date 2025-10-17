@@ -98,6 +98,16 @@ class ApiClient {
     });
     return response.data;
   }
+
+  async deletePost(postId: string) {
+    const response = await this.client.delete(`/api/posts/${postId}`);
+    return response.data;
+  }
+
+  async deleteComment(commentId: string) {
+    const response = await this.client.delete(`/api/posts/comments/${commentId}`);
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();
