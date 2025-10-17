@@ -283,11 +283,23 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       [id]
     );
 
+    // 获取用户信息
+    const userResult = await pool.query(
+      'SELECT id, username, avatar_url FROM users WHERE id = $1',
+      [request.user!.id]
+    );
+
     return {
       id: result.rows[0].id,
       post_id: parseInt(id, 10),
       content: text,
+      upvotes: 0,
       created_at: result.rows[0].created_at,
+      author: {
+        id: userResult.rows[0].id,
+        username: userResult.rows[0].username,
+        avatar_url: userResult.rows[0].avatar_url,
+      },
     };
   });
 
