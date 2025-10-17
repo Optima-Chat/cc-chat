@@ -201,7 +201,7 @@ function CommentItem({
                 <button
                   type="submit"
                   disabled={submitting || !replyText.trim()}
-                  className="px-4 py-1 text-sm bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-1 text-sm bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? '提交中...' : '回复'}
                 </button>
@@ -607,7 +607,7 @@ export default function PostDetail() {
                     <button
                       type="submit"
                       disabled={submitting || !commentText.trim()}
-                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {submitting ? '提交中...' : '发表评论'}
                     </button>
