@@ -83,6 +83,13 @@ class ApiClient {
     });
     return response.data;
   }
+
+  async voteComment(commentId: string, value: 1 | -1) {
+    const response = await this.client.post(`/api/posts/comments/${commentId}/vote`, {
+      value,
+    });
+    return response.data;
+  }
 }
 
 export const apiClient = new ApiClient();

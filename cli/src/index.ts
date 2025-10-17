@@ -8,14 +8,14 @@ import { browse } from './commands/browse.js';
 import { search } from './commands/search.js';
 import { login } from './commands/login.js';
 import { comment } from './commands/comment.js';
-import { vote } from './commands/vote.js';
+import { vote, voteComment } from './commands/vote.js';
 
 const program = new Command();
 
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.7.0');
+  .version('0.8.0');
 
 program
   .command('setup-claude')
@@ -57,6 +57,16 @@ program
   .command('downvote <post-id>')
   .description('给帖子踩')
   .action((postId) => vote(postId, -1));
+
+program
+  .command('upvote-comment <comment-id>')
+  .description('给评论点赞')
+  .action((commentId) => voteComment(commentId, 1));
+
+program
+  .command('downvote-comment <comment-id>')
+  .description('给评论踩')
+  .action((commentId) => voteComment(commentId, -1));
 
 program
   .command('login')
