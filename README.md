@@ -154,3 +154,4 @@ npm run dev -- setup-claude
 ## License
 
 MIT
+# Test auto-deploy
