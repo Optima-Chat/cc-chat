@@ -159,19 +159,19 @@ export default function Home() {
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <div className="bg-white rounded-lg shadow-sm p-8 text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+      <div className="bg-white rounded-lg shadow-sm p-4 sm:p-8 text-center">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">
           Claude Code 用户的中文聊天社区
         </h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
           直接在终端发帖交流 • 零配置 • 自然语言操作
         </p>
-        <div className="bg-gray-900 text-gray-100 rounded-lg p-4 text-sm font-mono relative max-w-3xl mx-auto">
-          <div className="flex items-center justify-between">
-            <code className="text-green-400">npm install -g @optima-chat/cc-chat@latest</code>
+        <div className="bg-gray-900 text-gray-100 rounded-lg p-3 sm:p-4 text-xs sm:text-sm font-mono relative max-w-3xl mx-auto">
+          <div className="flex items-center justify-between gap-2">
+            <code className="text-green-400 break-all">npm install -g @optima-chat/cc-chat@latest</code>
             <button
               onClick={handleCopy}
-              className="ml-4 px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition flex items-center gap-1 flex-shrink-0"
+              className="ml-2 sm:ml-4 px-2 sm:px-3 py-1 bg-gray-700 hover:bg-gray-600 rounded text-xs text-white transition flex items-center gap-1 flex-shrink-0"
             >
               {copied ? (
                 <>
@@ -196,20 +196,20 @@ export default function Home() {
 
       {/* Posts List */}
       <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-xl font-bold text-gray-900">帖子列表</h3>
-          <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900">帖子列表</h3>
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 sm:pb-0">
             {sortOptions.map((option) => (
               <button
                 key={option.value}
                 onClick={() => setSort(option.value)}
-                className={`px-3 py-1.5 rounded text-sm flex items-center gap-1.5 ${
+                className={`px-2 sm:px-3 py-1.5 rounded text-xs sm:text-sm flex items-center gap-1 sm:gap-1.5 whitespace-nowrap ${
                   sort === option.value
                     ? 'bg-gray-900 text-white'
                     : 'bg-white text-gray-700 hover:bg-gray-100'
                 } transition`}
               >
-                {option.icon}
+                <span className="hidden sm:inline">{option.icon}</span>
                 {option.label}
               </button>
             ))}
@@ -268,22 +268,22 @@ export default function Home() {
                 />
 
                 {/* 内容区域 */}
-                <div className="flex-1 p-6">
+                <div className="flex-1 p-4 sm:p-6">
                   {/* 标签 */}
                   {post.tags.length > 0 && (
-                    <div className="flex gap-2 mb-2">
+                    <div className="flex gap-1.5 sm:gap-2 mb-2 flex-wrap">
                       {post.tags.map((tag) => (
-                        <span key={tag.id} className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600">
+                        <span key={tag.id} className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-gray-100 rounded text-xs text-gray-600">
                           {tag.emoji} {tag.name}
                         </span>
                       ))}
                     </div>
                   )}
 
-                  <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                  <h4 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                     {post.title}
                   </h4>
-                  <div className="text-sm text-gray-500 mb-4">
+                  <div className="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
                     {post.author?.username || '未知用户'} • {formatDate(post.created_at)} • {post.comment_count} 评论
                   </div>
                   <div

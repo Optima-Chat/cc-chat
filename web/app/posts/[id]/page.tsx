@@ -177,7 +177,7 @@ export default function PostDetail() {
     <div className="bg-white rounded-lg shadow-sm">
       <div className="flex">
             {/* 投票区域 */}
-            <div className="p-4 bg-gray-50 rounded-l-lg">
+            <div className="p-2 sm:p-4 bg-gray-50 rounded-l-lg">
               <VoteButtons
                 postId={post.id}
                 initialScore={post.upvotes - post.downvotes}
@@ -186,14 +186,14 @@ export default function PostDetail() {
             </div>
 
             {/* 主内容区域 */}
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-4 sm:p-6">
               {/* 标签 */}
               {post.tags && post.tags.length > 0 && (
-                <div className="flex gap-2 mb-3">
+                <div className="flex gap-1.5 sm:gap-2 mb-3 flex-wrap">
                   {post.tags.map((tag) => (
                     <span
                       key={tag.id}
-                      className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded"
+                      className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded"
                     >
                       {tag.emoji} {tag.name}
                     </span>
@@ -202,10 +202,10 @@ export default function PostDetail() {
               )}
 
               {/* 标题 */}
-              <h1 className="text-2xl font-bold text-gray-900 mb-3">{post.title}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">{post.title}</h1>
 
               {/* 元信息 */}
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
                 <span className="font-medium text-gray-700">{post.author.username}</span>
                 <span>•</span>
                 <span>{formatDate(post.created_at)}</span>
@@ -215,21 +215,21 @@ export default function PostDetail() {
 
               {/* 内容 */}
               <div
-                className="prose max-w-none text-gray-700 mb-8"
+                className="prose prose-sm sm:prose max-w-none text-gray-700 mb-6 sm:mb-8"
                 dangerouslySetInnerHTML={{ __html: marked(post.content) }}
               />
 
               {/* 评论区分隔线 */}
-              <div className="border-t border-gray-200 my-6"></div>
+              <div className="border-t border-gray-200 my-4 sm:my-6"></div>
 
               {/* 评论输入框 */}
               {isLoggedIn ? (
-                <form onSubmit={handleSubmitComment} className="mb-8">
+                <form onSubmit={handleSubmitComment} className="mb-6 sm:mb-8">
                   <textarea
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="写下你的评论..."
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     rows={3}
                     disabled={submitting}
                   />
@@ -237,7 +237,7 @@ export default function PostDetail() {
                     <button
                       type="submit"
                       disabled={submitting || !commentText.trim()}
-                      className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {submitting ? '提交中...' : '发表评论'}
                     </button>
@@ -258,21 +258,21 @@ export default function PostDetail() {
               )}
 
               {/* 评论列表 */}
-              <div className="space-y-4">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="space-y-3 sm:space-y-4">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
                   评论 ({comments.length})
                 </h2>
 
                 {comments.length === 0 ? (
-                  <p className="text-gray-500 text-center py-8">暂无评论，来发表第一条评论吧！</p>
+                  <p className="text-sm sm:text-base text-gray-500 text-center py-6 sm:py-8">暂无评论，来发表第一条评论吧！</p>
                 ) : (
                   comments.map((comment) => (
-                    <div key={comment.id} className="border-l-2 border-gray-200 pl-4 py-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-gray-900">{comment.author.username}</span>
-                        <span className="text-sm text-gray-500">{formatDate(comment.created_at)}</span>
+                    <div key={comment.id} className="border-l-2 border-gray-200 pl-3 sm:pl-4 py-2">
+                      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+                        <span className="text-sm sm:text-base font-medium text-gray-900">{comment.author.username}</span>
+                        <span className="text-xs sm:text-sm text-gray-500">{formatDate(comment.created_at)}</span>
                       </div>
-                      <p className="text-gray-700 whitespace-pre-wrap">{comment.content}</p>
+                      <p className="text-sm sm:text-base text-gray-700 whitespace-pre-wrap">{comment.content}</p>
                     </div>
                   ))
                 )}

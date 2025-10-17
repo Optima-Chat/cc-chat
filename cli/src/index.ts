@@ -6,13 +6,14 @@ import { setupClaude } from './commands/setup-claude.js';
 import { post } from './commands/post.js';
 import { browse } from './commands/browse.js';
 import { login } from './commands/login.js';
+import { comment } from './commands/comment.js';
 
 const program = new Command();
 
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.4.3');
+  .version('0.5.0');
 
 program
   .command('setup-claude')
@@ -37,9 +38,7 @@ program
   .command('comment <post-id>')
   .description('评论帖子')
   .option('-t, --text <text>', '评论内容')
-  .action((postId, options) => {
-    console.log(chalk.yellow('comment 命令开发中...'));
-  });
+  .action(comment);
 
 program
   .command('login')
