@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { marked } from 'marked'
 import VoteButtons from '../../components/VoteButtons'
+import GithubLoginButton from '../../components/GithubLoginButton'
 
 interface Post {
   id: number
@@ -245,15 +246,8 @@ export default function PostDetail() {
                 </form>
               ) : (
                 <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
-                  <p className="text-gray-600">
-                    <button
-                      onClick={() => window.location.href = '/'}
-                      className="text-blue-600 hover:underline"
-                    >
-                      登录
-                    </button>
-                    {' '}后即可评论
-                  </p>
+                  <p className="text-gray-600 mb-3">登录后即可发表评论</p>
+                  <GithubLoginButton />
                 </div>
               )}
 
