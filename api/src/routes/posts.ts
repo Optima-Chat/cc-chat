@@ -389,31 +389,48 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
       return reply.status(400).send({ message: 'value 必须是 1（评论只支持点赞）' });
     }
 
-    // 检查评论是否存在
-    const commentCheck = await pool.query('SELECT id FROM comments WHERE id = $1', [id]);
-    if (commentCheck.rows.length === 0) {
-      return reply.status(404).send({ message: '评论不存在' });
-    }
+    try {
+      // 检查评论是否存在
+      const commentCheck = await pool.query('SELECT id FROM comments WHERE id = $1', [id]);
+      if (commentCheck.rows.length === 0) {
+        return reply.status(404).send({ message: '评论不存在' });
+      }
 
-    // 检查是否已经投过票
-    const existingVote = await pool.query(
-      'SELECT id FROM comment_votes WHERE user_id = $1 AND comment_id = $2',
-      [request.user!.id, id]
-    );
+      // 确保 comment_votes 表存在
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS comment_votes (
+          id SERIAL PRIMARY KEY,
+          user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+          comment_id INTEGER NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+          value INTEGER NOT NULL DEFAULT 1 CHECK (value = 1),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_id, comment_id)
+        )
+      `);
 
-    if (existingVote.rows.length > 0) {
-      // 取消点赞
-      await pool.query('DELETE FROM comment_votes WHERE user_id = $1 AND comment_id = $2', [request.user!.id, id]);
-      await pool.query('UPDATE comments SET upvotes = upvotes - 1 WHERE id = $1', [id]);
-      return { message: '已取消点赞' };
-    } else {
-      // 新点赞
-      await pool.query(
-        'INSERT INTO comment_votes (user_id, comment_id, value) VALUES ($1, $2, $3)',
-        [request.user!.id, id, value]
+      // 检查是否已经投过票
+      const existingVote = await pool.query(
+        'SELECT id FROM comment_votes WHERE user_id = $1 AND comment_id = $2',
+        [request.user!.id, id]
       );
-      await pool.query('UPDATE comments SET upvotes = upvotes + 1 WHERE id = $1', [id]);
-      return { message: '点赞成功' };
+
+      if (existingVote.rows.length > 0) {
+        // 取消点赞
+        await pool.query('DELETE FROM comment_votes WHERE user_id = $1 AND comment_id = $2', [request.user!.id, id]);
+        await pool.query('UPDATE comments SET upvotes = upvotes - 1 WHERE id = $1', [id]);
+        return { message: '已取消点赞' };
+      } else {
+        // 新点赞
+        await pool.query(
+          'INSERT INTO comment_votes (user_id, comment_id, value) VALUES ($1, $2, $3)',
+          [request.user!.id, id, value]
+        );
+        await pool.query('UPDATE comments SET upvotes = upvotes + 1 WHERE id = $1', [id]);
+        return { message: '点赞成功' };
+      }
+    } catch (error: any) {
+      fastify.log.error('Comment vote error:', error);
+      return reply.status(500).send({ message: error.message || '投票失败' });
     }
   });
 };

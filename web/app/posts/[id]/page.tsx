@@ -172,7 +172,9 @@ export default function PostDetail() {
             : comment
         ))
       } else {
-        alert('投票失败，请重试')
+        const errorData = await res.json().catch(() => ({ message: '未知错误' }))
+        console.error('Vote failed:', res.status, errorData)
+        alert(`投票失败: ${errorData.message || '请重试'}`)
       }
     } catch (error) {
       console.error('Failed to vote comment:', error)
