@@ -167,6 +167,7 @@ jobs:
         env:
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
+          REDDIT_USER_AGENT: ${{ secrets.REDDIT_USER_AGENT }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           CC_CHAT_TOKEN: ${{ secrets.CC_CHAT_TOKEN }}
 ```
@@ -208,10 +209,10 @@ CC_CHAT_TOKEN            # CC Chat 登录 token (GitHub ID)
 
 ### Phase 1: MVP (1 周)
 
-- [x] Reddit 爬虫
-- [x] OpenAI 翻译
-- [x] CC Chat 发布
-- [x] 本地测试运行
+- [ ] Reddit 爬虫
+- [ ] OpenAI 翻译
+- [ ] CC Chat 发布
+- [ ] 本地测试运行
 - [ ] GitHub Actions 部署
 
 ### Phase 2: 优化 (2 周)
@@ -231,7 +232,7 @@ CC_CHAT_TOKEN            # CC Chat 登录 token (GitHub ID)
 ## 预期效果
 
 - **内容量**: 每天 5-10 篇优质帖子
-- **成本**: ~$3/月 (OpenAI API)
+- **成本**: ~$0.5/月 (OpenAI API)
 - **维护**: 每周检查 1 次日志即可
 
 ## 监控指标
