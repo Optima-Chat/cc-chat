@@ -2,6 +2,9 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { setupClaude } from './commands/setup-claude.js';
 import { post } from './commands/post.js';
 import { browse } from './commands/browse.js';
@@ -16,12 +19,17 @@ import { savePost, unsavePost, getSavedPosts } from './commands/bookmarks.js';
 import { listTags } from './commands/tags.js';
 import { viewUser } from './commands/user.js';
 
+// 读取版本号
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
+
 const program = new Command();
 
 program
   .name('cc-chat')
   .description('Claude Code 用户的中文聊天社区')
-  .version('0.13.0');
+  .version(packageJson.version);
 
 program
   .command('setup-claude')
