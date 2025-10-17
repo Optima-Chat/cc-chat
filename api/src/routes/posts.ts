@@ -5,10 +5,11 @@ import { authenticate, AuthRequest } from '../middleware/auth.js';
 export const postsRoutes: FastifyPluginAsync = async (fastify) => {
   // 获取帖子列表
   fastify.get('/', async (request, reply) => {
-    const { limit = '10', sort = 'new', tag } = request.query as {
+    const { limit = '10', sort = 'new', tag, search } = request.query as {
       limit?: string;
       sort?: string;
       tag?: string;
+      search?: string;
     };
 
     let orderBy = 'p.created_at DESC';
@@ -38,15 +39,31 @@ export const postsRoutes: FastifyPluginAsync = async (fastify) => {
 
     const params: any[] = [];
     let paramIndex = 1;
+    const conditions: string[] = [];
 
     // 标签筛选
     if (tag) {
       query += `
         INNER JOIN post_tags pt ON p.id = pt.post_id
-        WHERE pt.tag_id = $${paramIndex}
       `;
+      conditions.push(`pt.tag_id = $${paramIndex}`);
       params.push(parseInt(tag, 10));
       paramIndex++;
+    }
+
+    // 搜索功能
+    if (search && search.trim()) {
+      const searchPattern = `%${search.trim()}%`;
+      conditions.push(`(p.title ILIKE $${paramIndex} OR p.content ILIKE $${paramIndex})`);
+      params.push(searchPattern);
+      paramIndex++;
+    }
+
+    // 添加 WHERE 条件
+    if (conditions.length > 0) {
+      query += `
+        WHERE ${conditions.join(' AND ')}
+      `;
     }
 
     query += `
