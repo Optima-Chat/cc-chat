@@ -6,11 +6,12 @@ interface VoteButtonsProps {
   postId: number
   initialScore: number
   initialUserVote?: 1 | -1 | 0
+  orientation?: 'vertical' | 'horizontal'
 }
 
 type VoteState = 1 | -1 | 0
 
-export default function VoteButtons({ postId, initialScore, initialUserVote = 0 }: VoteButtonsProps) {
+export default function VoteButtons({ postId, initialScore, initialUserVote = 0, orientation = 'vertical' }: VoteButtonsProps) {
   const [score, setScore] = useState(initialScore)
   const [voting, setVoting] = useState(false)
   const [userVote, setUserVote] = useState<VoteState>(initialUserVote) // 从API获取初始投票状态
@@ -93,9 +94,48 @@ export default function VoteButtons({ postId, initialScore, initialUserVote = 0 
     }
   }
 
+  if (orientation === 'horizontal') {
+    return (
+      <div
+        className="flex items-center gap-1.5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={(e) => handleVote(1, e)}
+          className={`transition disabled:opacity-50 ${
+            userVote === 1
+              ? 'text-orange-500'
+              : 'text-gray-400 hover:text-orange-500'
+          }`}
+          disabled={voting}
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 3L15 8H5L10 3Z" />
+          </svg>
+        </button>
+        <span className="text-sm font-semibold min-w-[24px] text-center">
+          {score}
+        </span>
+        <button
+          onClick={(e) => handleVote(-1, e)}
+          className={`transition disabled:opacity-50 ${
+            userVote === -1
+              ? 'text-blue-500'
+              : 'text-gray-400 hover:text-blue-500'
+          }`}
+          disabled={voting}
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 17L5 12H15L10 17Z" />
+          </svg>
+        </button>
+      </div>
+    )
+  }
+
   return (
     <div
-      className="flex flex-col items-center p-4 bg-gray-50 rounded-l-lg"
+      className="flex flex-col items-center"
       onClick={(e) => e.stopPropagation()}
     >
       <button

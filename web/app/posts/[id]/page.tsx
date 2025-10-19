@@ -83,15 +83,15 @@ function CommentItem({
   const maxDepth = 4 // 最大嵌套层数
 
   return (
-    <div className={`${depth > 0 ? 'ml-4 sm:ml-8 border-l-2 border-gray-300 pl-3 sm:pl-4' : ''} py-2`}>
-      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-2">
+    <div className={`${depth > 0 ? 'ml-3 sm:ml-8 border-l-2 border-gray-300 pl-2 sm:pl-4' : ''} py-2`}>
+      <div className="flex flex-wrap items-center gap-1.5 mb-1.5 sm:mb-2">
         <Link
           href={`/users/${comment.author.username}`}
-          className="text-sm sm:text-base font-medium text-gray-900 hover:text-blue-600 transition"
+          className="text-sm font-medium text-gray-900 hover:text-blue-600 transition"
         >
           {comment.author.username}
         </Link>
-        <span className="text-xs sm:text-sm text-gray-500">{formatDate(comment.created_at)}</span>
+        <span className="text-xs text-gray-500">{formatDate(comment.created_at)}</span>
         {score < -5 && (
           <span className="text-xs text-gray-400">评分过低</span>
         )}
@@ -104,32 +104,32 @@ function CommentItem({
             next.delete(comment.id)
             return next
           })}
-          className="text-xs sm:text-sm text-gray-500 hover:text-gray-700"
+          className="text-xs text-gray-500 hover:text-gray-700"
         >
           [点击展开评论]
         </button>
       ) : (
         <>
-          <div className="text-sm sm:text-base text-gray-700 mb-2">
+          <div className="text-sm text-gray-700 mb-2 leading-relaxed">
             <MarkdownContent content={comment.content} />
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
             {/* Upvote */}
             <button
               onClick={() => handleCommentVote(comment.id, 1)}
-              className={`flex items-center gap-1 text-xs sm:text-sm transition ${
+              className={`flex items-center gap-0.5 text-xs transition ${
                 comment.user_vote === 1
                   ? 'text-orange-500'
                   : 'text-gray-500 hover:text-orange-500'
               }`}
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
               </svg>
             </button>
 
             {/* Score */}
-            <span className={`text-xs sm:text-sm font-medium ${
+            <span className={`text-xs font-medium ${
               score > 0 ? 'text-orange-500' : score < 0 ? 'text-blue-500' : 'text-gray-500'
             }`}>
               {score}
@@ -138,13 +138,13 @@ function CommentItem({
             {/* Downvote */}
             <button
               onClick={() => handleCommentVote(comment.id, -1)}
-              className={`flex items-center gap-1 text-xs sm:text-sm transition ${
+              className={`flex items-center gap-0.5 text-xs transition ${
                 comment.user_vote === -1
                   ? 'text-blue-500'
                   : 'text-gray-500 hover:text-blue-500'
               }`}
             >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" transform="rotate(180)">
+              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="currentColor" viewBox="0 0 20 20" transform="rotate(180)">
                 <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
               </svg>
             </button>
@@ -160,7 +160,7 @@ function CommentItem({
                   setReplyingTo(comment.id)
                   setReplyText('')
                 }}
-                className="text-xs sm:text-sm text-gray-500 hover:text-blue-600 ml-2"
+                className="text-xs text-gray-500 hover:text-blue-600 ml-1 sm:ml-2"
               >
                 回复
               </button>
@@ -174,7 +174,7 @@ function CommentItem({
                     handleDeleteComment(comment.id)
                   }
                 }}
-                className="text-xs sm:text-sm text-red-500 hover:text-red-700 ml-2"
+                className="text-xs text-red-500 hover:text-red-700 ml-1 sm:ml-2"
               >
                 删除
               </button>
@@ -187,7 +187,7 @@ function CommentItem({
                   next.add(comment.id)
                   return next
                 })}
-                className="text-xs text-gray-400 hover:text-gray-600 ml-2"
+                className="text-xs text-gray-400 hover:text-gray-600 ml-1 sm:ml-2"
               >
                 [折叠]
               </button>
@@ -775,158 +775,311 @@ export default function PostDetail() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
-      <div className="flex">
-            {/* 投票区域 */}
-            <div className="p-2 sm:p-4 bg-gray-50 rounded-l-lg">
-              <VoteButtons
-                postId={post.id}
-                initialScore={post.upvotes - post.downvotes}
-                initialUserVote={post.user_vote || 0}
-              />
-            </div>
-
-            {/* 主内容区域 */}
-            <div className="flex-1 p-4 sm:p-6">
-              {/* 标签 */}
-              {post.tags && post.tags.length > 0 && (
-                <div className="flex gap-1.5 sm:gap-2 mb-3 flex-wrap">
-                  {post.tags.map((tag) => (
-                    <span
-                      key={tag.id}
-                      className="inline-flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded"
-                    >
-                      {tag.emoji} {tag.name}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* 标题 */}
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">{post.title}</h1>
-
-              {/* 元信息 */}
-              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
-                <Link
-                  href={`/users/${post.author.username}`}
-                  className="font-medium text-gray-700 hover:text-blue-600 transition"
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+      {/* 移动端：垂直布局 */}
+      <div className="sm:hidden">
+        <div className="px-4 pt-4 pb-3">
+          {/* 标签 */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex gap-1.5 mb-3 flex-wrap">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded"
                 >
-                  {post.author.username}
-                </Link>
-                <span>•</span>
-                <span>{formatDate(post.created_at)}</span>
-                <span>•</span>
-                <span>{post.comment_count} 条评论</span>
-
-                {/* Delete button for post author */}
-                {currentUsername === post.author.username && !post.deleted_at && (
-                  <>
-                    <span>•</span>
-                    <button
-                      onClick={() => {
-                        if (window.confirm('确定要删除这个帖子吗？删除后将无法恢复。')) {
-                          handleDeletePost()
-                        }
-                      }}
-                      className="text-red-500 hover:text-red-700 font-medium"
-                    >
-                      删除
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* 内容 */}
-              <div className="text-gray-700 mb-6 sm:mb-8">
-                <MarkdownContent content={post.content} />
-              </div>
-
-              {/* 操作按钮 */}
-              {isLoggedIn && (
-                <div className="flex gap-2 mb-4">
-                  <button
-                    onClick={handleBookmark}
-                    disabled={bookmarking}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
-                      bookmarked
-                        ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    <svg className="w-5 h-5" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                    </svg>
-                    <span className="text-sm font-medium">
-                      {bookmarking ? '处理中...' : bookmarked ? '已收藏' : '收藏'}
-                    </span>
-                  </button>
-                </div>
-              )}
-
-              {/* 评论区分隔线 */}
-              <div className="border-t border-gray-200 my-4 sm:my-6"></div>
-
-              {/* 评论输入框 */}
-              {isLoggedIn ? (
-                <form onSubmit={handleSubmitComment} className="mb-6 sm:mb-8">
-                  <textarea
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    placeholder="写下你的评论..."
-                    className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                    rows={3}
-                    disabled={submitting}
-                  />
-                  <div className="flex justify-end mt-2">
-                    <button
-                      type="submit"
-                      disabled={submitting || !commentText.trim()}
-                      className="px-4 sm:px-6 py-2 text-sm sm:text-base bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
-                    >
-                      {submitting ? '提交中...' : '发表评论'}
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
-                  <p className="text-gray-600 mb-3">登录后即可发表评论</p>
-                  <GithubLoginButton />
-                </div>
-              )}
-
-              {/* 评论列表 */}
-              <div className="space-y-3 sm:space-y-4">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">
-                  评论 ({comments.length})
-                </h2>
-
-                {comments.length === 0 ? (
-                  <p className="text-sm sm:text-base text-gray-500 text-center py-6 sm:py-8">暂无评论，来发表第一条评论吧！</p>
-                ) : (
-                  comments.map((comment) => (
-                    <CommentItem
-                      key={comment.id}
-                      comment={comment}
-                      depth={0}
-                      isLoggedIn={isLoggedIn}
-                      currentUsername={currentUsername}
-                      collapsedComments={collapsedComments}
-                      replyingTo={replyingTo}
-                      replyText={replyText}
-                      submitting={submitting}
-                      setCollapsedComments={setCollapsedComments}
-                      setReplyingTo={setReplyingTo}
-                      setReplyText={setReplyText}
-                      handleCommentVote={handleCommentVote}
-                      handleReply={handleReply}
-                      handleDeleteComment={handleDeleteComment}
-                      formatDate={formatDate}
-                    />
-                  ))
-                )}
-              </div>
+                  {tag.emoji} {tag.name}
+                </span>
+              ))}
             </div>
+          )}
+
+          {/* 标题 */}
+          <h1 className="text-lg font-bold text-gray-900 mb-2 leading-snug">{post.title}</h1>
+
+          {/* 元信息 */}
+          <div className="flex flex-wrap items-center gap-1.5 text-xs text-gray-500 mb-3">
+            <Link
+              href={`/users/${post.author.username}`}
+              className="font-medium text-gray-700 hover:text-blue-600 transition"
+            >
+              {post.author.username}
+            </Link>
+            <span>•</span>
+            <span>{formatDate(post.created_at)}</span>
+            <span>•</span>
+            <span>{post.comment_count} 条评论</span>
+
+            {/* Delete button for post author */}
+            {currentUsername === post.author.username && !post.deleted_at && (
+              <>
+                <span>•</span>
+                <button
+                  onClick={() => {
+                    if (window.confirm('确定要删除这个帖子吗？删除后将无法恢复。')) {
+                      handleDeletePost()
+                    }
+                  }}
+                  className="text-red-500 hover:text-red-700 font-medium"
+                >
+                  删除
+                </button>
+              </>
+            )}
           </div>
+
+          {/* 投票区域 - 横向排列 */}
+          <div className="flex items-center gap-2 py-2 border-y border-gray-200">
+            <VoteButtons
+              postId={post.id}
+              initialScore={post.upvotes - post.downvotes}
+              initialUserVote={post.user_vote || 0}
+              orientation="horizontal"
+            />
+            {isLoggedIn && (
+              <button
+                onClick={handleBookmark}
+                disabled={bookmarking}
+                className={`flex items-center gap-1 px-2 py-1 rounded transition text-xs ml-auto ${
+                  bookmarked
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-gray-100 text-gray-600'
+                } disabled:opacity-50`}
+              >
+                <svg className="w-4 h-4" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+                <span className="font-medium">
+                  {bookmarked ? '已收藏' : '收藏'}
+                </span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 内容 */}
+        <div className="px-4 py-3 text-gray-700 text-[15px] leading-relaxed">
+          <MarkdownContent content={post.content} />
+        </div>
+
+        {/* 评论区分隔线 */}
+        <div className="border-t-8 border-gray-100 my-2"></div>
+      </div>
+
+      {/* 桌面端：横向布局 */}
+      <div className="hidden sm:flex">
+        {/* 投票区域 */}
+        <div className="p-4 bg-gray-50 rounded-l-lg">
+          <VoteButtons
+            postId={post.id}
+            initialScore={post.upvotes - post.downvotes}
+            initialUserVote={post.user_vote || 0}
+          />
+        </div>
+
+        {/* 主内容区域 */}
+        <div className="flex-1 p-6">
+          {/* 标签 */}
+          {post.tags && post.tags.length > 0 && (
+            <div className="flex gap-2 mb-3 flex-wrap">
+              {post.tags.map((tag) => (
+                <span
+                  key={tag.id}
+                  className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded"
+                >
+                  {tag.emoji} {tag.name}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* 标题 */}
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">{post.title}</h1>
+
+          {/* 元信息 */}
+          <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500 mb-6">
+            <Link
+              href={`/users/${post.author.username}`}
+              className="font-medium text-gray-700 hover:text-blue-600 transition"
+            >
+              {post.author.username}
+            </Link>
+            <span>•</span>
+            <span>{formatDate(post.created_at)}</span>
+            <span>•</span>
+            <span>{post.comment_count} 条评论</span>
+
+            {/* Delete button for post author */}
+            {currentUsername === post.author.username && !post.deleted_at && (
+              <>
+                <span>•</span>
+                <button
+                  onClick={() => {
+                    if (window.confirm('确定要删除这个帖子吗？删除后将无法恢复。')) {
+                      handleDeletePost()
+                    }
+                  }}
+                  className="text-red-500 hover:text-red-700 font-medium"
+                >
+                  删除
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* 内容 */}
+          <div className="text-gray-700 mb-8">
+            <MarkdownContent content={post.content} />
+          </div>
+
+          {/* 操作按钮 */}
+          {isLoggedIn && (
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={handleBookmark}
+                disabled={bookmarking}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition ${
+                  bookmarked
+                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                <svg className="w-5 h-5" fill={bookmarked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+                <span className="text-sm font-medium">
+                  {bookmarking ? '处理中...' : bookmarked ? '已收藏' : '收藏'}
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* 评论区分隔线 */}
+          <div className="border-t border-gray-200 my-6"></div>
+
+          {/* 评论输入框 */}
+          {isLoggedIn ? (
+            <form onSubmit={handleSubmitComment} className="mb-8">
+              <textarea
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                placeholder="写下你的评论..."
+                className="w-full px-4 py-3 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                rows={3}
+                disabled={submitting}
+              />
+              <div className="flex justify-end mt-2">
+                <button
+                  type="submit"
+                  disabled={submitting || !commentText.trim()}
+                  className="px-6 py-2 text-base bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+                >
+                  {submitting ? '提交中...' : '发表评论'}
+                </button>
+              </div>
+            </form>
+          ) : (
+            <div className="mb-8 p-4 bg-gray-50 rounded-lg text-center">
+              <p className="text-gray-600 mb-3">登录后即可发表评论</p>
+              <GithubLoginButton />
+            </div>
+          )}
+
+          {/* 评论列表 */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              评论 ({comments.length})
+            </h2>
+
+            {comments.length === 0 ? (
+              <p className="text-base text-gray-500 text-center py-8">暂无评论，来发表第一条评论吧！</p>
+            ) : (
+              comments.map((comment) => (
+                <CommentItem
+                  key={comment.id}
+                  comment={comment}
+                  depth={0}
+                  isLoggedIn={isLoggedIn}
+                  currentUsername={currentUsername}
+                  collapsedComments={collapsedComments}
+                  replyingTo={replyingTo}
+                  replyText={replyText}
+                  submitting={submitting}
+                  setCollapsedComments={setCollapsedComments}
+                  setReplyingTo={setReplyingTo}
+                  setReplyText={setReplyText}
+                  handleCommentVote={handleCommentVote}
+                  handleReply={handleReply}
+                  handleDeleteComment={handleDeleteComment}
+                  formatDate={formatDate}
+                />
+              ))
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* 移动端和桌面端共用评论区 */}
+      <div className="px-4 pb-4 sm:hidden">
+        {/* 评论输入框 */}
+        {isLoggedIn ? (
+          <form onSubmit={handleSubmitComment} className="mb-6">
+            <textarea
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              placeholder="写下你的评论..."
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+              rows={3}
+              disabled={submitting}
+            />
+            <div className="flex justify-end mt-2">
+              <button
+                type="submit"
+                disabled={submitting || !commentText.trim()}
+                className="px-4 py-1.5 text-sm bg-black text-white font-medium rounded-lg hover:bg-gray-800 transition disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed"
+              >
+                {submitting ? '提交中...' : '发表评论'}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="mb-6 p-3 bg-gray-50 rounded-lg text-center">
+            <p className="text-sm text-gray-600 mb-2">登录后即可发表评论</p>
+            <GithubLoginButton />
+          </div>
+        )}
+
+        {/* 评论列表 */}
+        <div className="space-y-3">
+          <h2 className="text-base font-semibold text-gray-900 mb-3">
+            评论 ({comments.length})
+          </h2>
+
+          {comments.length === 0 ? (
+            <p className="text-sm text-gray-500 text-center py-6">暂无评论，来发表第一条评论吧！</p>
+          ) : (
+            comments.map((comment) => (
+              <CommentItem
+                key={comment.id}
+                comment={comment}
+                depth={0}
+                isLoggedIn={isLoggedIn}
+                currentUsername={currentUsername}
+                collapsedComments={collapsedComments}
+                replyingTo={replyingTo}
+                replyText={replyText}
+                submitting={submitting}
+                setCollapsedComments={setCollapsedComments}
+                setReplyingTo={setReplyingTo}
+                setReplyText={setReplyText}
+                handleCommentVote={handleCommentVote}
+                handleReply={handleReply}
+                handleDeleteComment={handleDeleteComment}
+                formatDate={formatDate}
+              />
+            ))
+          )}
+        </div>
+      </div>
     </div>
   )
 }
