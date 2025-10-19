@@ -352,6 +352,8 @@ export default function PostDetail() {
         console.error('Failed to fetch post:', error)
       } finally {
         setLoading(false)
+        // 确保页面滚动到顶部
+        window.scrollTo(0, 0)
       }
     }
 
